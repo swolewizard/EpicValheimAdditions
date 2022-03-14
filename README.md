@@ -101,12 +101,4 @@
 
 # Current issues:
 
-The Configs I've added tank in-game FPS by 10/15 and only progressively get worse over time.
-
-With Configs.
-
-![WithConfigs](https://i.imgur.com/Mx143DY.png)
-
-Without Configs.
-
-![WithoutConfigs](https://i.imgur.com/FnRnncz.png)
+Possible Conflict with Terraheim
