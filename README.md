@@ -100,5 +100,3 @@
 
 
 # Current issues:
-
-Possible Conflict with Terraheim
