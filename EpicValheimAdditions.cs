@@ -1769,24 +1769,18 @@ namespace EpicValheimsAdditions
             GameObject Golden_Wraith_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Wraith_Miniboss");
             PrefabManager.Instance.AddPrefab(Golden_Wraith_Miniboss);
             GameObject SvartalfrQueen = assetBundle.LoadAsset<GameObject>("SvartalfrQueen");
-            PrefabManager.Instance.AddPrefab(SvartalfrQueen);
+            CustomPrefab SvartalfrQueen1 = new CustomPrefab(SvartalfrQueen, true);
+            PrefabManager.Instance.AddPrefab(SvartalfrQueen1);
             GameObject SvarTentaRoot = assetBundle.LoadAsset<GameObject>("SvarTentaRoot");
+            CustomPrefab SvarTentaRoot1 = new CustomPrefab(SvarTentaRoot, true);
             PrefabManager.Instance.AddPrefab(SvarTentaRoot);
             GameObject JotunnBoss = assetBundle.LoadAsset<GameObject>("Jotunn");
-            PrefabManager.Instance.AddPrefab(JotunnBoss);
+            CustomPrefab JotunnBoss1 = new CustomPrefab(JotunnBoss, true);
+            PrefabManager.Instance.AddPrefab(JotunnBoss1);
             GameObject BlazingDamnedOne = assetBundle.LoadAsset<GameObject>("BlazingDamnedOne");
-            PrefabManager.Instance.AddPrefab(BlazingDamnedOne);
+            CustomPrefab BlazingDamnedOne1 = new CustomPrefab(BlazingDamnedOne, true);
+            PrefabManager.Instance.AddPrefab(BlazingDamnedOne1);
 
-
-            GameObject TrophySvartalfrQueen = assetBundle.LoadAsset<GameObject>("TrophySvartalfrQueen");
-            CustomItem TrophySvartalfrQueen1 = new CustomItem(TrophySvartalfrQueen, false);
-            ItemManager.Instance.AddItem(TrophySvartalfrQueen1);
-            GameObject TrophyJotunn = assetBundle.LoadAsset<GameObject>("TrophyJotunn");
-            CustomItem TrophyJotunn1 = new CustomItem(TrophyJotunn, false);
-            ItemManager.Instance.AddItem(TrophyJotunn1);
-            GameObject TrophyBlazingDamnedOne = assetBundle.LoadAsset<GameObject>("TrophyBlazingDamnedOne");
-            CustomItem TrophyBlazingDamnedOne1 = new CustomItem(TrophyBlazingDamnedOne, false);
-            ItemManager.Instance.AddItem(TrophyBlazingDamnedOne1);
 
             GameObject SvartalfrQueenGreatSword = assetBundle.LoadAsset<GameObject>("SvartalfrQueenGreatSword");
             CustomItem SvartalfrQueenGreatSword1 = new CustomItem(SvartalfrQueenGreatSword, false);
@@ -1797,6 +1791,19 @@ namespace EpicValheimsAdditions
             GameObject SvartalfrQueenBowArrowStorm = assetBundle.LoadAsset<GameObject>("SvartalfrQueenBowArrowStorm");
             CustomItem SvartalfrQueenBowArrowStorm1 = new CustomItem(SvartalfrQueenBowArrowStorm, false);
             ItemManager.Instance.AddItem(SvartalfrQueenBowArrowStorm1);
+            GameObject SvartalfrQueen_rootspawn = assetBundle.LoadAsset<GameObject>("SvartalfrQueen_rootspawn");
+            CustomItem SvartalfrQueen_rootspawn1 = new CustomItem(SvartalfrQueen_rootspawn, false);
+            ItemManager.Instance.AddItem(SvartalfrQueen_rootspawn1);
+
+            GameObject Jotunn_Groundslam = assetBundle.LoadAsset<GameObject>("Jotunn_Groundslam");
+            CustomItem Jotunn_Groundslam1 = new CustomItem(Jotunn_Groundslam, false);
+            ItemManager.Instance.AddItem(Jotunn_Groundslam1);
+            GameObject Jotunn_Groundslam2 = assetBundle.LoadAsset<GameObject>("Jotunn_Groundslam2");
+            CustomItem Jotunn_Groundslam21 = new CustomItem(Jotunn_Groundslam2, false);
+            ItemManager.Instance.AddItem(Jotunn_Groundslam21);
+            GameObject Jotunn_Shoot = assetBundle.LoadAsset<GameObject>("Jotunn_Shoot");
+            CustomItem Jotunn_Shoot1 = new CustomItem(Jotunn_Shoot, false);
+            ItemManager.Instance.AddItem(Jotunn_Shoot1);
 
             GameObject BlazingDamnedOneMace = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace");
             CustomItem BlazingDamnedOneMace1 = new CustomItem(BlazingDamnedOneMace, false);
@@ -1813,7 +1820,35 @@ namespace EpicValheimsAdditions
             GameObject BlazingDamnedOneShield = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneShield");
             CustomItem BlazingDamnedOneShield1 = new CustomItem(BlazingDamnedOneShield, false);
             ItemManager.Instance.AddItem(BlazingDamnedOneShield1);
+            GameObject EVA_BlazingHelm = assetBundle.LoadAsset<GameObject>("EVA_BlazingHelm");
+            CustomItem EVA_BlazingHelm1 = new CustomItem(EVA_BlazingHelm, false);
+            ItemManager.Instance.AddItem(EVA_BlazingHelm1);
+            GameObject EVA_BlazingChest = assetBundle.LoadAsset<GameObject>("EVA_BlazingChest");
+            CustomItem EVA_BlazingChest1 = new CustomItem(EVA_BlazingChest, false);
+            ItemManager.Instance.AddItem(EVA_BlazingChest1);
+            GameObject EVA_BlazingBoots = assetBundle.LoadAsset<GameObject>("EVA_BlazingBoots");
+            CustomItem EVA_BlazingBoots1 = new CustomItem(EVA_BlazingBoots, false);
+            ItemManager.Instance.AddItem(EVA_BlazingBoots1);
+            GameObject Blazing_Nova = assetBundle.LoadAsset<GameObject>("Blazing_Nova");
+            CustomItem Blazing_Nova1 = new CustomItem(Blazing_Nova, false);
+            ItemManager.Instance.AddItem(Blazing_Nova1);
+            GameObject Blazing_Meteors = assetBundle.LoadAsset<GameObject>("Blazing_Meteors");
+            CustomItem Blazing_Meteors1 = new CustomItem(Blazing_Meteors, false);
+            ItemManager.Instance.AddItem(Blazing_Meteors1);
+            GameObject Blazing_Shoot = assetBundle.LoadAsset<GameObject>("Blazing_Shoot");
+            CustomItem Blazing_Shoot1 = new CustomItem(Blazing_Shoot, false);
+            ItemManager.Instance.AddItem(Blazing_Shoot1);
 
+
+            GameObject TrophySvartalfrQueen = assetBundle.LoadAsset<GameObject>("TrophySvartalfrQueen");
+            CustomItem TrophySvartalfrQueen1 = new CustomItem(TrophySvartalfrQueen, false);
+            ItemManager.Instance.AddItem(TrophySvartalfrQueen1);
+            GameObject TrophyJotunn = assetBundle.LoadAsset<GameObject>("TrophyJotunn");
+            CustomItem TrophyJotunn1 = new CustomItem(TrophyJotunn, false);
+            ItemManager.Instance.AddItem(TrophyJotunn1);
+            GameObject TrophyBlazingDamnedOne = assetBundle.LoadAsset<GameObject>("TrophyBlazingDamnedOne");
+            CustomItem TrophyBlazingDamnedOne1 = new CustomItem(TrophyBlazingDamnedOne, false);
+            ItemManager.Instance.AddItem(TrophyBlazingDamnedOne1);
 
             Jotunn.Logger.LogInfo("Loaded BossStuff");
         }
