@@ -170,7 +170,7 @@ namespace LitJson
             hex_seq = new char[4];
             indentation = 0;
             indent_value = 4;
-            pretty_print = false;
+            pretty_print = true;
             validate = true;
             lower_case_properties = false;
 

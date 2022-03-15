@@ -1985,7 +1985,6 @@ namespace EpicValheimsAdditions
             });
             bossConfigs.Add(BlazingDamnedOneConfig);
 
-            //var jsonText = JsonConvert.SerializeObject(bossConfigs, Formatting.Indented);
             var jsonText = JsonMapper.ToJson(bossConfigs);
             File.WriteAllText(configPath, jsonText);
 
@@ -2061,7 +2060,6 @@ namespace EpicValheimsAdditions
             Jotunn.Logger.LogDebug($"Attempting to load config file from path {configPath}");
             var jsonText = AssetUtils.LoadText(configPath);
             Jotunn.Logger.LogDebug("File found. Attempting to deserialize...");
-            //var bossconfigs = JsonConvert.DeserializeObject<List<BossConfig>>(jsonText);
             var bossconfigs = JsonMapper.ToObject<List<BossConfig>>(jsonText);
             return bossconfigs;
         }
