@@ -11,13 +11,15 @@ using System.IO;
 using System.Reflection;
 using UnityEngine;
 
-namespace EpicValheimAdditions
+namespace EpicValheimsAdditions
 {
-    [BepInPlugin("Huntard.EpicValheimsAdditions", "Epic Valheims Additions - by Huntard", "1.6.5")]
+    [BepInPlugin("Huntard.EpicValheimsAdditions", "Epic Valheims Additions - by Huntard", "1.6.6")]
     [BepInDependency("com.jotunn.jotunn", BepInDependency.DependencyFlags.HardDependency)]
     public class Core : BaseUnityPlugin
     {
+        
         private Harmony _harmony;
+
 
         [HarmonyPatch(typeof(ZNetScene), "Awake")]
         private class Patch_ZNetScene_Awake
@@ -1879,6 +1881,7 @@ namespace EpicValheimAdditions
             SvartalfrQueenConfig.Attacks.Add(new CustomAttack
             {
                 AttackName = SvartalfrQueenRootspawn.name,
+                AttackAnimation = SvartalfrQueenRootspawn.m_itemData.m_shared.m_attack.m_attackAnimation,
                 AiAttackRange = SvartalfrQueenRootspawn.m_itemData.m_shared.m_aiAttackRange,
                 AiAttackRangeMin = SvartalfrQueenRootspawn.m_itemData.m_shared.m_aiAttackRangeMin,
                 AiAttackInterval = SvartalfrQueenRootspawn.m_itemData.m_shared.m_aiAttackInterval
@@ -1896,6 +1899,7 @@ namespace EpicValheimAdditions
             SvartalfrQueenConfig.Attacks.Add(new CustomAttack
             {
                 AttackName = SvartalfrQueenBowArrowStorm.name,
+                AttackAnimation = SvartalfrQueenBowArrowStorm.m_itemData.m_shared.m_attack.m_attackAnimation,
                 AiAttackRange = SvartalfrQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackRange,
                 AiAttackRangeMin = SvartalfrQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackRangeMin,
                 AiAttackInterval = SvartalfrQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackInterval
@@ -1933,6 +1937,7 @@ namespace EpicValheimAdditions
             BlazingDamnedOneConfig.Attacks.Add(new CustomAttack
             {
                 AttackName = Blazing_Meteors.name,
+                AttackAnimation = Blazing_Meteors.m_itemData.m_shared.m_attack.m_attackAnimation,
                 AiAttackRange = Blazing_Meteors.m_itemData.m_shared.m_aiAttackRange,
                 AiAttackRangeMin = Blazing_Meteors.m_itemData.m_shared.m_aiAttackRangeMin,
                 AiAttackInterval = Blazing_Meteors.m_itemData.m_shared.m_aiAttackInterval
@@ -1958,6 +1963,7 @@ namespace EpicValheimAdditions
                 config.Attacks.Add(new CustomAttack
                 {
                     AttackName = attack.name,
+                    AttackAnimation = attack.m_itemData.m_shared.m_attack.m_attackAnimation,
                     AiAttackRange = attack.m_itemData.m_shared.m_aiAttackRange,
                     AiAttackRangeMin = attack.m_itemData.m_shared.m_aiAttackRangeMin,
                     AiAttackInterval = attack.m_itemData.m_shared.m_aiAttackInterval,
@@ -1991,6 +1997,8 @@ namespace EpicValheimAdditions
                                 var itemDrop = PrefabManager.Cache.GetPrefab<ItemDrop>(attack.AttackName);
                                 if (attack.Damages != null)
                                     itemDrop.m_itemData.m_shared.m_damages = attack.Damages.Value;
+                                if (attack.AttackAnimation != null)
+                                    itemDrop.m_itemData.m_shared.m_attack.m_attackAnimation = attack.AttackAnimation;
                                 itemDrop.m_itemData.m_shared.m_aiAttackRange = attack.AiAttackRange;
                                 itemDrop.m_itemData.m_shared.m_aiAttackRangeMin = attack.AiAttackRangeMin;
                                 itemDrop.m_itemData.m_shared.m_aiAttackInterval = attack.AiAttackInterval;
@@ -2008,7 +2016,7 @@ namespace EpicValheimAdditions
                 }
             }
 
-            Jotunn.Logger.LogInfo("Loaded Configs");
+            Jotunn.Logger.LogInfo("Loaded configs");
 
         }
 
@@ -2038,6 +2046,7 @@ namespace EpicValheimAdditions
     public class CustomAttack
     {
         public string AttackName { get; set; }
+        public string AttackAnimation { get; set; }
         public float AiAttackRange { get; set; }
         public float AiAttackRangeMin { get; set; }
         public float AiAttackInterval { get; set; }
