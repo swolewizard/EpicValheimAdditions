@@ -13,11 +13,16 @@ using UnityEngine;
 
 namespace EpicValheimsAdditions
 {
-    [BepInPlugin("Huntard.EpicValheimsAdditions", "Epic Valheims Additions - by Huntard", "1.6.6")]
+    [BepInPlugin(ModGUID, ModName, ModVersion)]
     [BepInDependency("com.jotunn.jotunn", BepInDependency.DependencyFlags.HardDependency)]
     public class Core : BaseUnityPlugin
     {
-        
+		private const string ModName = "Epic Valheims Additions - by Huntard";
+		private const string ModVersion = "1.6.6";
+		private const string ModGUID = "Huntard.EpicValheimsAdditions";
+
+        public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
+        private AssetBundle assetBundle;
         private Harmony _harmony;
 
 
@@ -2063,10 +2068,6 @@ namespace EpicValheimsAdditions
             var bossconfigs = JsonConvert.DeserializeObject<List<BossConfig>>(jsonText);
             return bossconfigs;
         }
-
-        public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, "Huntard.EpicValheimsAdditions.json");
-
-        private AssetBundle assetBundle;
     }
 
     [Serializable]
