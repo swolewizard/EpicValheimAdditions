@@ -76,32 +76,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EpicValheimAdditions.cs" />
+    <Compile Include="LitJson\IJsonWrapper.cs" />
+    <Compile Include="LitJson\JsonData.cs" />
+    <Compile Include="LitJson\JsonException.cs" />
+    <Compile Include="LitJson\JsonMapper.cs" />
+    <Compile Include="LitJson\JsonMockWrapper.cs" />
+    <Compile Include="LitJson\JsonReader.cs" />
+    <Compile Include="LitJson\JsonWriter.cs" />
+    <Compile Include="LitJson\Lexer.cs" />
+    <Compile Include="LitJson\Netstandard15Polyfill.cs" />
+    <Compile Include="LitJson\ParserToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="eva_assets" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="ILRepack.Lib.MSBuild.Task">
-      <Version>2.0.18.2</Version>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>13.0.1</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Newtonsoft.Json.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="System.Data.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="System.Runtime.Serialization.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ILRepack.targets" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
