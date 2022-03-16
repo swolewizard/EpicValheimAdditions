@@ -101,6 +101,4 @@
 
 # Current issues:
 
-* Getting [Warning: HarmonyX] when the mod loads.
-* Getting [Error : Unity Log] NullReferenceException: when bosses are spawned & attacking.
-* These errors only happen for a few people, and don't seem to break anything.
+* None so far.
