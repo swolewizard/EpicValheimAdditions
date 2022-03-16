@@ -17,9 +17,9 @@ namespace EpicValheimsAdditions
     [BepInDependency("com.jotunn.jotunn", BepInDependency.DependencyFlags.HardDependency)]
     public class Core : BaseUnityPlugin
     {
-		private const string ModName = "Epic Valheims Additions - by Huntard";
-		private const string ModVersion = "1.6.6";
-		private const string ModGUID = "Huntard.EpicValheimsAdditions";
+        private const string ModName = "Epic Valheims Additions - by Huntard";
+        private const string ModVersion = "1.6.7";
+        private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
         private AssetBundle assetBundle;
@@ -133,7 +133,7 @@ namespace EpicValheimsAdditions
 
         private void Awake()
         {
-            _harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), "Huntard.EpicValheimsAdditions");
+            _harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), ModGUID);
             this.RegisterPrefabs();
             this.CreateCraftingPieces();
             this.CreateIngots_Scales_Ores();
@@ -2036,9 +2036,13 @@ namespace EpicValheimsAdditions
                             {
                                 var itemDrop = PrefabManager.Cache.GetPrefab<ItemDrop>(attack.AttackName);
                                 if (attack.Damages != null)
+                                {
                                     itemDrop.m_itemData.m_shared.m_damages = attack.Damages.Value;
+                                }
                                 if (attack.AttackAnimation != null)
+                                {
                                     itemDrop.m_itemData.m_shared.m_attack.m_attackAnimation = attack.AttackAnimation;
+                                }
                                 itemDrop.m_itemData.m_shared.m_aiAttackRange = attack.AiAttackRange;
                                 itemDrop.m_itemData.m_shared.m_aiAttackRangeMin = attack.AiAttackRangeMin;
                                 itemDrop.m_itemData.m_shared.m_aiAttackInterval = attack.AiAttackInterval;
