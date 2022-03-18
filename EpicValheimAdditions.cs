@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.6.7";
+        private const string ModVersion = "1.7.0";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -39,6 +39,7 @@ namespace EpicValheimsAdditions
         {
             public static void Prefix(OfferingBowl __instance)
             {
+               
                 if (__instance == null) return;
                 var FuelEffects = new EffectList.EffectData[2]
                     {
@@ -1681,7 +1682,7 @@ namespace EpicValheimsAdditions
         private void RegisterBossStuff()
         {
             GameObject svartalfrqueenaltar = assetBundle.LoadAsset<GameObject>("SvartalfrQueenAltar_New");
-            CustomPrefab svartalfrqueenaltar1 = new CustomPrefab(svartalfrqueenaltar, false);
+            CustomPrefab svartalfrqueenaltar1 = new CustomPrefab(svartalfrqueenaltar, true);
             PrefabManager.Instance.AddPrefab(svartalfrqueenaltar1);
 
             GameObject jotunnaltar = assetBundle.LoadAsset<GameObject>("JotunnAltar");
@@ -1766,9 +1767,9 @@ namespace EpicValheimsAdditions
             });
             ItemManager.Instance.AddItem(CursedEffigy);
 
-
             GameObject Golden_Greydwarf_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Greydwarf_Miniboss");
-            PrefabManager.Instance.AddPrefab(Golden_Greydwarf_Miniboss);
+            CustomPrefab Golden_Greydwarf_Miniboss1 = new CustomPrefab(Golden_Greydwarf_Miniboss, true);
+            PrefabManager.Instance.AddPrefab(Golden_Greydwarf_Miniboss1);
             GameObject Golden_Troll_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Troll_Miniboss");
             PrefabManager.Instance.AddPrefab(Golden_Troll_Miniboss);
             GameObject Golden_Wraith_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Wraith_Miniboss");
@@ -1989,6 +1990,42 @@ namespace EpicValheimsAdditions
                 Damages = projectile_meteor_blazing.m_damage
             });
             bossConfigs.Add(BlazingDamnedOneConfig);
+
+            // Golden_Greydwarf_Miniboss
+            var GoldenGreydwarfConfig = new BossConfig();
+            var GoldenGreydwarfPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Golden_Greydwarf_Miniboss");
+            GoldenGreydwarfConfig.BossPrefabName = "Golden_Greydwarf_Miniboss";
+            GoldenGreydwarfConfig.Health = (int)GoldenGreydwarfPrefab.m_health;
+
+            GoldenGreydwarfConfig.Attacks = new List<CustomAttack>();
+            var GoldenGreydwarfStandardAttacks = new List<string> { "Greydwarf_elite_attack_gold" };
+            AddDefaultAttacks(GoldenGreydwarfConfig, GoldenGreydwarfStandardAttacks);
+
+            bossConfigs.Add(GoldenGreydwarfConfig);
+
+            // Golden_Troll_Miniboss
+            var GoldenTrollConfig = new BossConfig();
+            var GoldenTrollPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Golden_Troll_Miniboss");
+            GoldenTrollConfig.BossPrefabName = "Golden_Troll_Miniboss";
+            GoldenTrollConfig.Health = (int)GoldenTrollPrefab.m_health;
+
+            GoldenTrollConfig.Attacks = new List<CustomAttack>();
+            var GoldenTrollStandardAttacks = new List<string> { "troll_punch", "troll_groundslam", "troll_throw" };
+            AddDefaultAttacks(GoldenTrollConfig, GoldenTrollStandardAttacks);
+
+            bossConfigs.Add(GoldenTrollConfig);
+
+            // Golden_Wraith_Miniboss
+            var GoldenWraithConfig = new BossConfig();
+            var GoldenWraithPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Golden_Wraith_Miniboss");
+            GoldenWraithConfig.BossPrefabName = "Golden_Wraith_Miniboss";
+            GoldenWraithConfig.Health = (int)GoldenWraithPrefab.m_health;
+
+            GoldenWraithConfig.Attacks = new List<CustomAttack>();
+            var GoldenWraithStandardAttacks = new List<string> { "wraith_melee_gold" };
+            AddDefaultAttacks(GoldenWraithConfig, GoldenWraithStandardAttacks);
+
+            bossConfigs.Add(GoldenWraithConfig);
 
             var jsonText = JsonMapper.ToJson(bossConfigs);
             File.WriteAllText(configPath, jsonText);
