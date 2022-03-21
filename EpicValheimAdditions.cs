@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.7.0";
+        private const string ModVersion = "1.7.1";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -140,9 +140,10 @@ namespace EpicValheimsAdditions
             this.CreateIngots_Scales_Ores();
             this.RegisterMiscItems();
             this.RegisterBossStuff();
+            this.RegisterHeavymetalWeapons();
             this.RegisterFrometalWeapons();
             this.RegisterFlametalWeapons();
-            this.RegisterHeavymetalWeapons();
+            this.RegisterDeepAbyssWeapons();
             this.AddVegetation();
             this.CustomConversions();
             this.LoadConfig();
@@ -517,7 +518,34 @@ namespace EpicValheimsAdditions
             GameObject gameObject5 = this.assetBundle.LoadAsset<GameObject>("FrometalBar");
             CustomItem customItem5 = new CustomItem(gameObject5, false);
             ItemManager.Instance.AddItem(customItem5);
+            GameObject gameObject2 = this.assetBundle.LoadAsset<GameObject>("DeepAbyssEssence");
+            CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
+            {
+                Amount = 5,
+                CraftingStation = "piece_thorsforge",
+                Requirements = new RequirementConfig[] {
+                        new RequirementConfig {
+                            Item = "HeavymetalBar",
+                                Amount = 5
+                        },
+                        new RequirementConfig {
+                            Item = "FrometalBar",
+                                Amount = 5
+                        },
+                        new RequirementConfig {
+                            Item = "Flametal",
+                                Amount = 5
+                        },
+                        new RequirementConfig {
+                            Item = "TrophyBlazingDamnedOne",
+                                Amount = 1
+                        }
+                    }
+            });
+            ItemManager.Instance.AddItem(customItem2);
 
+
+            
 
 
             GameObject gameObject4 = this.assetBundle.LoadAsset<GameObject>("Heavyscale");
@@ -1679,6 +1707,60 @@ namespace EpicValheimsAdditions
             Jotunn.Logger.LogInfo("Loaded FlametalWeapons");
         }
 
+        private void RegisterDeepAbyssWeapons()
+        {
+            GameObject gameObject = this.assetBundle.LoadAsset<GameObject>("TridentDeepAbyss");
+            CustomItem customItem = new CustomItem(gameObject, false, new ItemConfig
+            {
+                Amount = 1,
+                CraftingStation = "piece_thorsforge",
+                Requirements = new RequirementConfig[] {
+                        new RequirementConfig {
+                            Item = "DeepAbyssEssence",
+                                Amount = 20,
+                                AmountPerLevel = 10
+                        },
+                        new RequirementConfig {
+                            Item = "WorldTreeFragment",
+                                Amount = 8,
+                                AmountPerLevel = 4
+                        },
+                        new RequirementConfig {
+                            Item = "BurningWorldTreeFragment",
+                                Amount = 8,
+                                AmountPerLevel = 4
+                        }
+                    }
+            });
+            ItemManager.Instance.AddItem(customItem);
+
+            GameObject gameObject2 = this.assetBundle.LoadAsset<GameObject>("BowDeepAbyss");
+            CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
+            {
+                Amount = 1,
+                CraftingStation = "piece_thorsforge",
+                Requirements = new RequirementConfig[] {
+                        new RequirementConfig {
+                            Item = "DeepAbyssEssence",
+                                Amount = 20,
+                                AmountPerLevel = 10
+                        },
+                        new RequirementConfig {
+                            Item = "WorldTreeFragment",
+                                Amount = 8,
+                                AmountPerLevel = 4
+                        },
+                        new RequirementConfig {
+                            Item = "BurningWorldTreeFragment",
+                                Amount = 8,
+                                AmountPerLevel = 4
+                        }
+                    }
+            });
+            ItemManager.Instance.AddItem(customItem2);
+            Jotunn.Logger.LogInfo("Loaded DeepAbyssWeapons");
+        }
+
         private void RegisterBossStuff()
         {
             GameObject svartalfrqueenaltar = assetBundle.LoadAsset<GameObject>("SvartalfrQueenAltar_New");
@@ -1771,9 +1853,11 @@ namespace EpicValheimsAdditions
             CustomPrefab Golden_Greydwarf_Miniboss1 = new CustomPrefab(Golden_Greydwarf_Miniboss, true);
             PrefabManager.Instance.AddPrefab(Golden_Greydwarf_Miniboss1);
             GameObject Golden_Troll_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Troll_Miniboss");
-            PrefabManager.Instance.AddPrefab(Golden_Troll_Miniboss);
+            CustomPrefab Golden_Troll_Miniboss1 = new CustomPrefab(Golden_Troll_Miniboss, true);
+            PrefabManager.Instance.AddPrefab(Golden_Troll_Miniboss1);
             GameObject Golden_Wraith_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Wraith_Miniboss");
-            PrefabManager.Instance.AddPrefab(Golden_Wraith_Miniboss);
+            CustomPrefab Golden_Wraith_Miniboss1 = new CustomPrefab(Golden_Wraith_Miniboss, true);
+            PrefabManager.Instance.AddPrefab(Golden_Wraith_Miniboss1);
             GameObject SvartalfrQueen = assetBundle.LoadAsset<GameObject>("SvartalfrQueen");
             CustomPrefab SvartalfrQueen1 = new CustomPrefab(SvartalfrQueen, true);
             PrefabManager.Instance.AddPrefab(SvartalfrQueen1);
@@ -1889,7 +1973,7 @@ namespace EpicValheimsAdditions
             if (!File.Exists(configPath))
             {
                 GenerateConfigFile();
-                Jotunn.Logger.LogInfo("Generated new config");
+                Jotunn.Logger.LogInfo("Generated new configs");
                 return;
             }
             RegisterConfigValues();
@@ -1899,7 +1983,7 @@ namespace EpicValheimsAdditions
                 File.Delete(configPath);
                 GenerateConfigFile();
 
-                Jotunn.Logger.LogInfo("Updated config");
+                Jotunn.Logger.LogInfo("Updated configs");
             }
 
         }
@@ -2048,7 +2132,6 @@ namespace EpicValheimsAdditions
                 });
             }
         }
-
 
         private void RegisterConfigValues()
         {
