@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.7.1";
+        private const string ModVersion = "1.7.2";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -363,7 +363,7 @@ namespace EpicValheimsAdditions
 
         private void CreateCraftingPieces()
         {
-            GameObject gameObject = this.assetBundle.LoadAsset<GameObject>("piece_alchemystation");
+            GameObject gameObject = assetBundle.LoadAsset<GameObject>("piece_alchemystation");
             Piece component = gameObject.GetComponent<Piece>();
             component.m_name = "Inscription Table";
             component.m_description = "Rune Crafting/Upgrading.";
@@ -394,7 +394,7 @@ namespace EpicValheimsAdditions
             });
             PieceManager.Instance.AddPiece(customPiece);
             ///
-            GameObject gameObject5 = this.assetBundle.LoadAsset<GameObject>("piece_thorsforge");
+            GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("piece_thorsforge");
             CustomPiece customPiece5 = new CustomPiece(gameObject5, false, new PieceConfig
             {
                 PieceTable = "_HammerPieceTable",
@@ -512,13 +512,13 @@ namespace EpicValheimsAdditions
         private void CreateIngots_Scales_Ores()
         {
 
-            GameObject gameObject3 = this.assetBundle.LoadAsset<GameObject>("HeavymetalBar");
+            GameObject gameObject3 = assetBundle.LoadAsset<GameObject>("HeavymetalBar");
             CustomItem customItem3 = new CustomItem(gameObject3, false);
             ItemManager.Instance.AddItem(customItem3);
-            GameObject gameObject5 = this.assetBundle.LoadAsset<GameObject>("FrometalBar");
+            GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("FrometalBar");
             CustomItem customItem5 = new CustomItem(gameObject5, false);
             ItemManager.Instance.AddItem(customItem5);
-            GameObject gameObject2 = this.assetBundle.LoadAsset<GameObject>("DeepAbyssEssence");
+            GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("DeepAbyssEssence");
             CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
             {
                 Amount = 5,
@@ -548,7 +548,7 @@ namespace EpicValheimsAdditions
             
 
 
-            GameObject gameObject4 = this.assetBundle.LoadAsset<GameObject>("Heavyscale");
+            GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("Heavyscale");
             ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
             component4.m_itemData.m_dropPrefab = gameObject4;
             component4.m_itemData.m_shared.m_name = "Heavyscale";
@@ -570,7 +570,7 @@ namespace EpicValheimsAdditions
             });
             ItemManager.Instance.AddItem(customItem4);
             ///
-            GameObject gameObject6 = this.assetBundle.LoadAsset<GameObject>("Drakescale");
+            GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("Drakescale");
             ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
             component6.m_itemData.m_dropPrefab = gameObject6;
             component6.m_itemData.m_shared.m_name = "Drakescale";
@@ -592,7 +592,7 @@ namespace EpicValheimsAdditions
             });
             ItemManager.Instance.AddItem(customItem6);
             ///
-            GameObject gameObject8 = this.assetBundle.LoadAsset<GameObject>("Forgedscale");
+            GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("Forgedscale");
             ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
             component8.m_itemData.m_dropPrefab = gameObject8;
             component8.m_itemData.m_shared.m_name = "Forgedscale";
@@ -617,11 +617,11 @@ namespace EpicValheimsAdditions
 
 
 
-            GameObject oreheavymetal = this.assetBundle.LoadAsset<GameObject>("OreHeavymetal");
+            GameObject oreheavymetal = assetBundle.LoadAsset<GameObject>("OreHeavymetal");
             CustomItem oreheavymetal1 = new CustomItem(oreheavymetal, false);
             ItemManager.Instance.AddItem(oreheavymetal1);
 
-            GameObject orefrometal = this.assetBundle.LoadAsset<GameObject>("OreFrometal");
+            GameObject orefrometal = assetBundle.LoadAsset<GameObject>("OreFrometal");
             CustomItem orefrometal1 = new CustomItem(orefrometal, false);
             ItemManager.Instance.AddItem(orefrometal1);
 
@@ -630,7 +630,7 @@ namespace EpicValheimsAdditions
 
         private void RegisterHeavymetalWeapons()
         {
-            GameObject gameObject = this.assetBundle.LoadAsset<GameObject>("BowHeavymetal");
+            GameObject gameObject = assetBundle.LoadAsset<GameObject>("BowHeavymetal");
             ItemDrop component = gameObject.GetComponent<ItemDrop>();
             component.m_itemData.m_shared.m_maxDurability = 200;
             component.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -657,7 +657,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem);
-            GameObject gameObject2 = this.assetBundle.LoadAsset<GameObject>("AtgeirHeavymetal");
+            GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("AtgeirHeavymetal");
             ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
             component2.m_itemData.m_shared.m_maxDurability = 200;
             component2.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -684,7 +684,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem2);
-            GameObject gameObject3 = this.assetBundle.LoadAsset<GameObject>("SledgeHeavymetal");
+            GameObject gameObject3 = assetBundle.LoadAsset<GameObject>("SledgeHeavymetal");
             ItemDrop component3 = gameObject3.GetComponent<ItemDrop>();
             component3.m_itemData.m_shared.m_maxDurability = 200;
             component3.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -711,7 +711,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem3);
-            GameObject gameObject4 = this.assetBundle.LoadAsset<GameObject>("BattleaxeHeavymetal");
+            GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("BattleaxeHeavymetal");
             ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
             component4.m_itemData.m_shared.m_maxDurability = 200;
             component4.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -738,7 +738,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem4);
-            GameObject gameObject5 = this.assetBundle.LoadAsset<GameObject>("SpearHeavymetal");
+            GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("SpearHeavymetal");
             ItemDrop component5 = gameObject5.GetComponent<ItemDrop>();
             component5.m_itemData.m_shared.m_maxDurability = 200;
             component5.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -765,7 +765,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem5);
-            GameObject gameObject6 = this.assetBundle.LoadAsset<GameObject>("KnifeHeavymetal");
+            GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("KnifeHeavymetal");
             ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
             component6.m_itemData.m_shared.m_maxDurability = 200;
             component6.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -792,7 +792,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem6);
-            GameObject gameObject7 = this.assetBundle.LoadAsset<GameObject>("MaceHeavymetal");
+            GameObject gameObject7 = assetBundle.LoadAsset<GameObject>("MaceHeavymetal");
             ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
             component7.m_itemData.m_shared.m_maxDurability = 200;
             component7.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -819,7 +819,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem7);
-            GameObject gameObject8 = this.assetBundle.LoadAsset<GameObject>("GreatSwordHeavymetal");
+            GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("GreatSwordHeavymetal");
             ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
             component8.m_itemData.m_shared.m_maxDurability = 200;
             component8.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -846,7 +846,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem8);
-            GameObject gameObject9 = this.assetBundle.LoadAsset<GameObject>("SwordHeavymetal");
+            GameObject gameObject9 = assetBundle.LoadAsset<GameObject>("SwordHeavymetal");
             ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
             component9.m_itemData.m_shared.m_maxDurability = 200;
             component9.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -873,7 +873,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem9);
-            GameObject gameObject10 = this.assetBundle.LoadAsset<GameObject>("ShieldHeavymetal");
+            GameObject gameObject10 = assetBundle.LoadAsset<GameObject>("ShieldHeavymetal");
             ItemDrop component10 = gameObject10.GetComponent<ItemDrop>();
             component10.m_itemData.m_shared.m_name = "Heavymetal Shield";
             component10.m_itemData.m_shared.m_maxDurability = 200;
@@ -901,7 +901,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem10);
-            GameObject gameObject11 = this.assetBundle.LoadAsset<GameObject>("ShieldHeavymetalTower");
+            GameObject gameObject11 = assetBundle.LoadAsset<GameObject>("ShieldHeavymetalTower");
             ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
             component11.m_itemData.m_shared.m_maxDurability = 200;
             component11.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -928,7 +928,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem11);
-            GameObject gameObject12 = this.assetBundle.LoadAsset<GameObject>("AxeHeavymetal");
+            GameObject gameObject12 = assetBundle.LoadAsset<GameObject>("AxeHeavymetal");
             ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
             component12.m_itemData.m_shared.m_maxDurability = 200;
             component12.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -951,11 +951,15 @@ namespace EpicValheimsAdditions
                             Item = "LinenThread",
                                 Amount = 15,
                                 AmountPerLevel = 8
+                        },
+                        new RequirementConfig {
+                            Item = "TrophySvartalfrQueen",
+                                Amount = 1
                         }
                     }
             });
             ItemManager.Instance.AddItem(customItem12);
-            GameObject gameObject13 = this.assetBundle.LoadAsset<GameObject>("PickaxeHeavymetal");
+            GameObject gameObject13 = assetBundle.LoadAsset<GameObject>("PickaxeHeavymetal");
             ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
             component13.m_itemData.m_shared.m_maxDurability = 200;
             component13.m_itemData.m_shared.m_durabilityPerLevel = 50;
@@ -978,6 +982,10 @@ namespace EpicValheimsAdditions
                             Item = "LinenThread",
                                 Amount = 15,
                                 AmountPerLevel = 8
+                        },
+                        new RequirementConfig {
+                            Item = "TrophySvartalfrQueen",
+                                Amount = 1
                         }
                     }
             });
@@ -987,7 +995,7 @@ namespace EpicValheimsAdditions
 
         private void RegisterFrometalWeapons()
         {
-            GameObject gameObject = this.assetBundle.LoadAsset<GameObject>("BowFrometal");
+            GameObject gameObject = assetBundle.LoadAsset<GameObject>("BowFrometal");
             ItemDrop component = gameObject.GetComponent<ItemDrop>();
             component.m_itemData.m_shared.m_maxDurability = 250;
             component.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1019,7 +1027,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem);
-            GameObject gameObject2 = this.assetBundle.LoadAsset<GameObject>("AtgeirFrometal");
+            GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("AtgeirFrometal");
             ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
             component2.m_itemData.m_shared.m_maxDurability = 250;
             component2.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1051,7 +1059,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem2);
-            GameObject gameObject4 = this.assetBundle.LoadAsset<GameObject>("SledgeFrometal");
+            GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("SledgeFrometal");
             ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
             component4.m_itemData.m_shared.m_maxDurability = 250;
             component4.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1083,7 +1091,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem4);
-            GameObject gameObject5 = this.assetBundle.LoadAsset<GameObject>("BattleaxeFrometal");
+            GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("BattleaxeFrometal");
             ItemDrop component5 = gameObject5.GetComponent<ItemDrop>();
             component5.m_itemData.m_shared.m_maxDurability = 250;
             component5.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1115,7 +1123,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem5);
-            GameObject gameObject6 = this.assetBundle.LoadAsset<GameObject>("SpearFrometal");
+            GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("SpearFrometal");
             ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
             component6.m_itemData.m_shared.m_maxDurability = 250;
             component6.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1142,7 +1150,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem6);
-            GameObject gameObject7 = this.assetBundle.LoadAsset<GameObject>("KnifeFrometal");
+            GameObject gameObject7 = assetBundle.LoadAsset<GameObject>("KnifeFrometal");
             ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
             component7.m_itemData.m_shared.m_maxDurability = 250;
             component7.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1169,7 +1177,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem7);
-            GameObject gameObject8 = this.assetBundle.LoadAsset<GameObject>("MaceFrometal");
+            GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("MaceFrometal");
             ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
             component8.m_itemData.m_shared.m_maxDurability = 250;
             component8.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1201,7 +1209,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem8);
-            GameObject gameObject9 = this.assetBundle.LoadAsset<GameObject>("GreatSwordFrometal");
+            GameObject gameObject9 = assetBundle.LoadAsset<GameObject>("GreatSwordFrometal");
             ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
             component9.m_itemData.m_shared.m_maxDurability = 250;
             component9.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1228,7 +1236,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem9);
-            GameObject gameObject10 = this.assetBundle.LoadAsset<GameObject>("SwordFrometal");
+            GameObject gameObject10 = assetBundle.LoadAsset<GameObject>("SwordFrometal");
             ItemDrop component10 = gameObject10.GetComponent<ItemDrop>();
             component10.m_itemData.m_shared.m_maxDurability = 250;
             component10.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1260,7 +1268,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem10);
-            GameObject ShieldFrometal = this.assetBundle.LoadAsset<GameObject>("ShieldFrometal");
+            GameObject ShieldFrometal = assetBundle.LoadAsset<GameObject>("ShieldFrometal");
             ItemDrop ItemDrop = ShieldFrometal.GetComponent<ItemDrop>();
             ItemDrop.m_itemData.m_shared.m_name = "Frometal Shield";
             ItemDrop.m_itemData.m_shared.m_maxDurability = 250;
@@ -1288,7 +1296,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(ShieldFrometalBM);
-            GameObject gameObject11 = this.assetBundle.LoadAsset<GameObject>("ShieldFrometalTower");
+            GameObject gameObject11 = assetBundle.LoadAsset<GameObject>("ShieldFrometalTower");
             ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
             component11.m_itemData.m_shared.m_name = "Frometal Tower Shield";
             component11.m_itemData.m_shared.m_description = "A Towershield made out of Frometal.";
@@ -1318,7 +1326,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem11);
-            GameObject gameObject12 = this.assetBundle.LoadAsset<GameObject>("AxeFrometal");
+            GameObject gameObject12 = assetBundle.LoadAsset<GameObject>("AxeFrometal");
             ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
             component12.m_itemData.m_shared.m_maxDurability = 250;
             component12.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1342,11 +1350,15 @@ namespace EpicValheimsAdditions
                             Item = "WorldTreeFragment",
                                 Amount = 2,
                                 AmountPerLevel = 1
+                        },
+                        new RequirementConfig {
+                            Item = "TrophyJotunn",
+                                Amount = 1
                         }
                     }
             });
             ItemManager.Instance.AddItem(customItem12);
-            GameObject gameObject13 = this.assetBundle.LoadAsset<GameObject>("PickaxeFrometal");
+            GameObject gameObject13 = assetBundle.LoadAsset<GameObject>("PickaxeFrometal");
             ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
             component13.m_itemData.m_shared.m_maxDurability = 250;
             component13.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1370,6 +1382,10 @@ namespace EpicValheimsAdditions
                             Item = "WorldTreeFragment",
                                 Amount = 2,
                                 AmountPerLevel = 1
+                        },
+                        new RequirementConfig {
+                            Item = "TrophyJotunn",
+                                Amount = 1
                         }
                     }
             });
@@ -1379,7 +1395,7 @@ namespace EpicValheimsAdditions
 
         private void RegisterFlametalWeapons()
         {
-            GameObject gameObject = this.assetBundle.LoadAsset<GameObject>("BowFlametal");
+            GameObject gameObject = assetBundle.LoadAsset<GameObject>("BowFlametal");
             ItemDrop component = gameObject.GetComponent<ItemDrop>();
             component.m_itemData.m_shared.m_maxDurability = 300;
             component.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1406,7 +1422,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem);
-            GameObject gameObject2 = this.assetBundle.LoadAsset<GameObject>("AtgeirFlametal");
+            GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("AtgeirFlametal");
             ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
             component2.m_itemData.m_shared.m_maxDurability = 300;
             component2.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1433,7 +1449,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem2);
-            GameObject gameObject4 = this.assetBundle.LoadAsset<GameObject>("SledgeFlametal");
+            GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("SledgeFlametal");
             ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
             component4.m_itemData.m_shared.m_maxDurability = 300;
             component4.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1460,7 +1476,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem4);
-            GameObject gameObject5 = this.assetBundle.LoadAsset<GameObject>("BattleaxeFlametal");
+            GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("BattleaxeFlametal");
             ItemDrop component5 = gameObject5.GetComponent<ItemDrop>();
             component5.m_itemData.m_shared.m_maxDurability = 300;
             component5.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1487,7 +1503,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem5);
-            GameObject gameObject6 = this.assetBundle.LoadAsset<GameObject>("SpearFlametal");
+            GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("SpearFlametal");
             ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
             component6.m_itemData.m_shared.m_maxDurability = 300;
             component6.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1509,7 +1525,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem6);
-            GameObject gameObject7 = this.assetBundle.LoadAsset<GameObject>("KnifeFlametal");
+            GameObject gameObject7 = assetBundle.LoadAsset<GameObject>("KnifeFlametal");
             ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
             component7.m_itemData.m_shared.m_maxDurability = 300;
             component7.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1531,7 +1547,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem7);
-            GameObject gameObject8 = this.assetBundle.LoadAsset<GameObject>("MaceFlametal");
+            GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("MaceFlametal");
             ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
             component8.m_itemData.m_shared.m_maxDurability = 300;
             component8.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1558,7 +1574,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem8);
-            GameObject gameObject9 = this.assetBundle.LoadAsset<GameObject>("GreatSwordFlametal");
+            GameObject gameObject9 = assetBundle.LoadAsset<GameObject>("GreatSwordFlametal");
             ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
             component9.m_itemData.m_shared.m_maxDurability = 300;
             component9.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1585,7 +1601,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem9);
-            GameObject gameObject10 = this.assetBundle.LoadAsset<GameObject>("SwordFlametal");
+            GameObject gameObject10 = assetBundle.LoadAsset<GameObject>("SwordFlametal");
             ItemDrop component10 = gameObject10.GetComponent<ItemDrop>();
             component10.m_itemData.m_shared.m_maxDurability = 300;
             component10.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1612,7 +1628,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem10);
-            GameObject ShieldFlametal = this.assetBundle.LoadAsset<GameObject>("ShieldFlametal");
+            GameObject ShieldFlametal = assetBundle.LoadAsset<GameObject>("ShieldFlametal");
             ItemDrop ItemDrop = ShieldFlametal.GetComponent<ItemDrop>();
             ItemDrop.m_itemData.m_shared.m_name = "Flametal Shield";
             ItemDrop.m_itemData.m_shared.m_maxDurability = 300;
@@ -1635,7 +1651,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(ShieldFlametalBM);
-            GameObject gameObject11 = this.assetBundle.LoadAsset<GameObject>("ShieldFlametalTower");
+            GameObject gameObject11 = assetBundle.LoadAsset<GameObject>("ShieldFlametalTower");
             ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
             component11.m_itemData.m_shared.m_name = "Flametal Tower Shield";
             component11.m_itemData.m_shared.m_description = "A Towershield made out of Flametal.";
@@ -1660,7 +1676,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem11);
-            GameObject gameObject12 = this.assetBundle.LoadAsset<GameObject>("AxeFlametal");
+            GameObject gameObject12 = assetBundle.LoadAsset<GameObject>("AxeFlametal");
             ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
             component12.m_itemData.m_shared.m_maxDurability = 300;
             component12.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1678,11 +1694,15 @@ namespace EpicValheimsAdditions
                             Item = "BurningWorldTreeFragment",
                                 Amount = 4,
                                 AmountPerLevel = 2
+                        },
+                        new RequirementConfig {
+                            Item = "TrophyBlazingDamnedOne",
+                                Amount = 1
                         }
                     }
             });
             ItemManager.Instance.AddItem(customItem12);
-            GameObject gameObject13 = this.assetBundle.LoadAsset<GameObject>("PickaxeFlametal");
+            GameObject gameObject13 = assetBundle.LoadAsset<GameObject>("PickaxeFlametal");
             ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
             component13.m_itemData.m_shared.m_maxDurability = 300;
             component13.m_itemData.m_shared.m_durabilityPerLevel = 75;
@@ -1700,6 +1720,10 @@ namespace EpicValheimsAdditions
                             Item = "BurningWorldTreeFragment",
                                 Amount = 4,
                                 AmountPerLevel = 2
+                        },
+                        new RequirementConfig {
+                            Item = "TrophyBlazingDamnedOne",
+                                Amount = 1
                         }
                     }
             });
@@ -1709,7 +1733,7 @@ namespace EpicValheimsAdditions
 
         private void RegisterDeepAbyssWeapons()
         {
-            GameObject gameObject = this.assetBundle.LoadAsset<GameObject>("TridentDeepAbyss");
+            GameObject gameObject = assetBundle.LoadAsset<GameObject>("TridentDeepAbyss");
             CustomItem customItem = new CustomItem(gameObject, false, new ItemConfig
             {
                 Amount = 1,
@@ -1734,7 +1758,7 @@ namespace EpicValheimsAdditions
             });
             ItemManager.Instance.AddItem(customItem);
 
-            GameObject gameObject2 = this.assetBundle.LoadAsset<GameObject>("BowDeepAbyss");
+            GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("BowDeepAbyss");
             CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
             {
                 Amount = 1,
@@ -1758,6 +1782,31 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem2);
+
+            GameObject gameObject3 = assetBundle.LoadAsset<GameObject>("GreatSwordDeepAbyss");
+            CustomItem customItem3= new CustomItem(gameObject3, false, new ItemConfig
+            {
+                Amount = 1,
+                CraftingStation = "piece_thorsforge",
+                Requirements = new RequirementConfig[] {
+                        new RequirementConfig {
+                            Item = "DeepAbyssEssence",
+                                Amount = 60,
+                                AmountPerLevel = 40
+                        },
+                        new RequirementConfig {
+                            Item = "WorldTreeFragment",
+                                Amount = 40,
+                                AmountPerLevel = 20
+                        },
+                        new RequirementConfig {
+                            Item = "BurningWorldTreeFragment",
+                                Amount = 40,
+                                AmountPerLevel = 20
+                        }
+                    }
+            });
+            ItemManager.Instance.AddItem(customItem3);
             Jotunn.Logger.LogInfo("Loaded DeepAbyssWeapons");
         }
 
@@ -2201,7 +2250,7 @@ namespace EpicValheimsAdditions
         public int Health { get; set; }
         public List<CustomAttack> Attacks { get; set; }
     }
-
+    
     [Serializable]
     public class CustomAttack
     {
