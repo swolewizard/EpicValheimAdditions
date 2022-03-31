@@ -149,5 +149,4 @@ Example Config for SvartalfrQueen and one of her attacks.
 
 If you like what I do and want to support me.
 
-<a href="https://www.buymeacoffee.com/Huntard"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=Huntard&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
-
+[![](https://i.imgur.com/d5IpNXJ.png)](https://www.buymeacoffee.com/Huntard)
