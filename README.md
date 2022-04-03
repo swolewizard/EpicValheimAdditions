@@ -1,4 +1,4 @@
-![](https://i.imgur.com/dNU5CwR.png)
+![](https://i.imgur.com/4XooUJw.png)
 
 # Epic Valheim Additions
  My Valheim mod from here: [https://www.nexusmods.com/valheim/mods/1475](https://www.nexusmods.com/valheim/mods/1475)
