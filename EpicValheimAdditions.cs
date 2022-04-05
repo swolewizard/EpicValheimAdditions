@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.7.2";
+        private const string ModVersion = "1.7.3";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -369,7 +369,7 @@ namespace EpicValheimsAdditions
             component.m_description = "Rune Crafting/Upgrading.";
             CraftingStation component2 = gameObject.GetComponent<CraftingStation>();
             component2.m_name = "Inscription Table";
-            CustomPiece customPiece = new CustomPiece(gameObject, false, new PieceConfig
+            CustomPiece customPiece = new CustomPiece(gameObject, true, new PieceConfig
             {
                 PieceTable = "_HammerPieceTable",
                 CraftingStation = "piece_workbench",
@@ -395,7 +395,7 @@ namespace EpicValheimsAdditions
             PieceManager.Instance.AddPiece(customPiece);
             ///
             GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("piece_thorsforge");
-            CustomPiece customPiece5 = new CustomPiece(gameObject5, false, new PieceConfig
+            CustomPiece customPiece5 = new CustomPiece(gameObject5, true, new PieceConfig
             {
                 PieceTable = "_HammerPieceTable",
                 AllowedInDungeons = false,
@@ -513,13 +513,13 @@ namespace EpicValheimsAdditions
         {
 
             GameObject gameObject3 = assetBundle.LoadAsset<GameObject>("HeavymetalBar");
-            CustomItem customItem3 = new CustomItem(gameObject3, false);
+            CustomItem customItem3 = new CustomItem(gameObject3, true);
             ItemManager.Instance.AddItem(customItem3);
             GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("FrometalBar");
-            CustomItem customItem5 = new CustomItem(gameObject5, false);
+            CustomItem customItem5 = new CustomItem(gameObject5, true);
             ItemManager.Instance.AddItem(customItem5);
             GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("DeepAbyssEssence");
-            CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
+            CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
             {
                 Amount = 5,
                 CraftingStation = "piece_thorsforge",
@@ -553,7 +553,7 @@ namespace EpicValheimsAdditions
             component4.m_itemData.m_dropPrefab = gameObject4;
             component4.m_itemData.m_shared.m_name = "Heavyscale";
             component4.m_itemData.m_shared.m_description = "A scale, which is quite heavy";
-            CustomItem customItem4 = new CustomItem(gameObject4, false, new ItemConfig
+            CustomItem customItem4 = new CustomItem(gameObject4, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -575,7 +575,7 @@ namespace EpicValheimsAdditions
             component6.m_itemData.m_dropPrefab = gameObject6;
             component6.m_itemData.m_shared.m_name = "Drakescale";
             component6.m_itemData.m_shared.m_description = "A frosty scale, cold to the touch";
-            CustomItem customItem6 = new CustomItem(gameObject6, false, new ItemConfig
+            CustomItem customItem6 = new CustomItem(gameObject6, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -597,7 +597,7 @@ namespace EpicValheimsAdditions
             component8.m_itemData.m_dropPrefab = gameObject8;
             component8.m_itemData.m_shared.m_name = "Forgedscale";
             component8.m_itemData.m_shared.m_description = "A scale, forged by a master";
-            CustomItem customItem8 = new CustomItem(gameObject8, false, new ItemConfig
+            CustomItem customItem8 = new CustomItem(gameObject8, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -618,11 +618,11 @@ namespace EpicValheimsAdditions
 
 
             GameObject oreheavymetal = assetBundle.LoadAsset<GameObject>("OreHeavymetal");
-            CustomItem oreheavymetal1 = new CustomItem(oreheavymetal, false);
+            CustomItem oreheavymetal1 = new CustomItem(oreheavymetal, true);
             ItemManager.Instance.AddItem(oreheavymetal1);
 
             GameObject orefrometal = assetBundle.LoadAsset<GameObject>("OreFrometal");
-            CustomItem orefrometal1 = new CustomItem(orefrometal, false);
+            CustomItem orefrometal1 = new CustomItem(orefrometal, true);
             ItemManager.Instance.AddItem(orefrometal1);
 
             Jotunn.Logger.LogInfo("Loaded Ingots/scales/ore");
@@ -634,7 +634,7 @@ namespace EpicValheimsAdditions
             ItemDrop component = gameObject.GetComponent<ItemDrop>();
             component.m_itemData.m_shared.m_maxDurability = 200;
             component.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem = new CustomItem(gameObject, false, new ItemConfig
+            CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -661,7 +661,7 @@ namespace EpicValheimsAdditions
             ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
             component2.m_itemData.m_shared.m_maxDurability = 200;
             component2.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
+            CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -688,7 +688,7 @@ namespace EpicValheimsAdditions
             ItemDrop component3 = gameObject3.GetComponent<ItemDrop>();
             component3.m_itemData.m_shared.m_maxDurability = 200;
             component3.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem3 = new CustomItem(gameObject3, false, new ItemConfig
+            CustomItem customItem3 = new CustomItem(gameObject3, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -715,7 +715,7 @@ namespace EpicValheimsAdditions
             ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
             component4.m_itemData.m_shared.m_maxDurability = 200;
             component4.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem4 = new CustomItem(gameObject4, false, new ItemConfig
+            CustomItem customItem4 = new CustomItem(gameObject4, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -742,7 +742,7 @@ namespace EpicValheimsAdditions
             ItemDrop component5 = gameObject5.GetComponent<ItemDrop>();
             component5.m_itemData.m_shared.m_maxDurability = 200;
             component5.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem5 = new CustomItem(gameObject5, false, new ItemConfig
+            CustomItem customItem5 = new CustomItem(gameObject5, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -769,7 +769,7 @@ namespace EpicValheimsAdditions
             ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
             component6.m_itemData.m_shared.m_maxDurability = 200;
             component6.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem6 = new CustomItem(gameObject6, false, new ItemConfig
+            CustomItem customItem6 = new CustomItem(gameObject6, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -796,7 +796,7 @@ namespace EpicValheimsAdditions
             ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
             component7.m_itemData.m_shared.m_maxDurability = 200;
             component7.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem7 = new CustomItem(gameObject7, false, new ItemConfig
+            CustomItem customItem7 = new CustomItem(gameObject7, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -823,7 +823,7 @@ namespace EpicValheimsAdditions
             ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
             component8.m_itemData.m_shared.m_maxDurability = 200;
             component8.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem8 = new CustomItem(gameObject8, false, new ItemConfig
+            CustomItem customItem8 = new CustomItem(gameObject8, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -850,7 +850,7 @@ namespace EpicValheimsAdditions
             ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
             component9.m_itemData.m_shared.m_maxDurability = 200;
             component9.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem9 = new CustomItem(gameObject9, false, new ItemConfig
+            CustomItem customItem9 = new CustomItem(gameObject9, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -878,7 +878,7 @@ namespace EpicValheimsAdditions
             component10.m_itemData.m_shared.m_name = "Heavymetal Shield";
             component10.m_itemData.m_shared.m_maxDurability = 200;
             component10.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem10 = new CustomItem(gameObject10, false, new ItemConfig
+            CustomItem customItem10 = new CustomItem(gameObject10, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -905,7 +905,7 @@ namespace EpicValheimsAdditions
             ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
             component11.m_itemData.m_shared.m_maxDurability = 200;
             component11.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem11 = new CustomItem(gameObject11, false, new ItemConfig
+            CustomItem customItem11 = new CustomItem(gameObject11, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -932,7 +932,7 @@ namespace EpicValheimsAdditions
             ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
             component12.m_itemData.m_shared.m_maxDurability = 200;
             component12.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem12 = new CustomItem(gameObject12, false, new ItemConfig
+            CustomItem customItem12 = new CustomItem(gameObject12, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -963,7 +963,7 @@ namespace EpicValheimsAdditions
             ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
             component13.m_itemData.m_shared.m_maxDurability = 200;
             component13.m_itemData.m_shared.m_durabilityPerLevel = 50;
-            CustomItem customItem13 = new CustomItem(gameObject13, false, new ItemConfig
+            CustomItem customItem13 = new CustomItem(gameObject13, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -999,7 +999,7 @@ namespace EpicValheimsAdditions
             ItemDrop component = gameObject.GetComponent<ItemDrop>();
             component.m_itemData.m_shared.m_maxDurability = 250;
             component.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem = new CustomItem(gameObject, false, new ItemConfig
+            CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1031,7 +1031,7 @@ namespace EpicValheimsAdditions
             ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
             component2.m_itemData.m_shared.m_maxDurability = 250;
             component2.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
+            CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1063,7 +1063,7 @@ namespace EpicValheimsAdditions
             ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
             component4.m_itemData.m_shared.m_maxDurability = 250;
             component4.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem4 = new CustomItem(gameObject4, false, new ItemConfig
+            CustomItem customItem4 = new CustomItem(gameObject4, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1095,7 +1095,7 @@ namespace EpicValheimsAdditions
             ItemDrop component5 = gameObject5.GetComponent<ItemDrop>();
             component5.m_itemData.m_shared.m_maxDurability = 250;
             component5.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem5 = new CustomItem(gameObject5, false, new ItemConfig
+            CustomItem customItem5 = new CustomItem(gameObject5, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1127,7 +1127,7 @@ namespace EpicValheimsAdditions
             ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
             component6.m_itemData.m_shared.m_maxDurability = 250;
             component6.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem6 = new CustomItem(gameObject6, false, new ItemConfig
+            CustomItem customItem6 = new CustomItem(gameObject6, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1154,7 +1154,7 @@ namespace EpicValheimsAdditions
             ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
             component7.m_itemData.m_shared.m_maxDurability = 250;
             component7.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem7 = new CustomItem(gameObject7, false, new ItemConfig
+            CustomItem customItem7 = new CustomItem(gameObject7, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1181,7 +1181,7 @@ namespace EpicValheimsAdditions
             ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
             component8.m_itemData.m_shared.m_maxDurability = 250;
             component8.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem8 = new CustomItem(gameObject8, false, new ItemConfig
+            CustomItem customItem8 = new CustomItem(gameObject8, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1213,7 +1213,7 @@ namespace EpicValheimsAdditions
             ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
             component9.m_itemData.m_shared.m_maxDurability = 250;
             component9.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem9 = new CustomItem(gameObject9, false, new ItemConfig
+            CustomItem customItem9 = new CustomItem(gameObject9, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1240,7 +1240,7 @@ namespace EpicValheimsAdditions
             ItemDrop component10 = gameObject10.GetComponent<ItemDrop>();
             component10.m_itemData.m_shared.m_maxDurability = 250;
             component10.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem10 = new CustomItem(gameObject10, false, new ItemConfig
+            CustomItem customItem10 = new CustomItem(gameObject10, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1273,7 +1273,7 @@ namespace EpicValheimsAdditions
             ItemDrop.m_itemData.m_shared.m_name = "Frometal Shield";
             ItemDrop.m_itemData.m_shared.m_maxDurability = 250;
             ItemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem ShieldFrometalBM = new CustomItem(ShieldFrometal, false, new ItemConfig
+            CustomItem ShieldFrometalBM = new CustomItem(ShieldFrometal, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1303,7 +1303,7 @@ namespace EpicValheimsAdditions
             component11.m_itemData.m_shared.m_variants = 0;
             component11.m_itemData.m_shared.m_maxDurability = 250;
             component11.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem11 = new CustomItem(gameObject11, false, new ItemConfig
+            CustomItem customItem11 = new CustomItem(gameObject11, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1330,7 +1330,7 @@ namespace EpicValheimsAdditions
             ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
             component12.m_itemData.m_shared.m_maxDurability = 250;
             component12.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem12 = new CustomItem(gameObject12, false, new ItemConfig
+            CustomItem customItem12 = new CustomItem(gameObject12, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1362,7 +1362,7 @@ namespace EpicValheimsAdditions
             ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
             component13.m_itemData.m_shared.m_maxDurability = 250;
             component13.m_itemData.m_shared.m_durabilityPerLevel = 65;
-            CustomItem customItem13 = new CustomItem(gameObject13, false, new ItemConfig
+            CustomItem customItem13 = new CustomItem(gameObject13, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1399,7 +1399,7 @@ namespace EpicValheimsAdditions
             ItemDrop component = gameObject.GetComponent<ItemDrop>();
             component.m_itemData.m_shared.m_maxDurability = 300;
             component.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem = new CustomItem(gameObject, false, new ItemConfig
+            CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1426,7 +1426,7 @@ namespace EpicValheimsAdditions
             ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
             component2.m_itemData.m_shared.m_maxDurability = 300;
             component2.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
+            CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1453,7 +1453,7 @@ namespace EpicValheimsAdditions
             ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
             component4.m_itemData.m_shared.m_maxDurability = 300;
             component4.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem4 = new CustomItem(gameObject4, false, new ItemConfig
+            CustomItem customItem4 = new CustomItem(gameObject4, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1480,7 +1480,7 @@ namespace EpicValheimsAdditions
             ItemDrop component5 = gameObject5.GetComponent<ItemDrop>();
             component5.m_itemData.m_shared.m_maxDurability = 300;
             component5.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem5 = new CustomItem(gameObject5, false, new ItemConfig
+            CustomItem customItem5 = new CustomItem(gameObject5, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1507,7 +1507,7 @@ namespace EpicValheimsAdditions
             ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
             component6.m_itemData.m_shared.m_maxDurability = 300;
             component6.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem6 = new CustomItem(gameObject6, false, new ItemConfig
+            CustomItem customItem6 = new CustomItem(gameObject6, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1529,7 +1529,7 @@ namespace EpicValheimsAdditions
             ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
             component7.m_itemData.m_shared.m_maxDurability = 300;
             component7.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem7 = new CustomItem(gameObject7, false, new ItemConfig
+            CustomItem customItem7 = new CustomItem(gameObject7, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1551,7 +1551,7 @@ namespace EpicValheimsAdditions
             ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
             component8.m_itemData.m_shared.m_maxDurability = 300;
             component8.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem8 = new CustomItem(gameObject8, false, new ItemConfig
+            CustomItem customItem8 = new CustomItem(gameObject8, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1578,7 +1578,7 @@ namespace EpicValheimsAdditions
             ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
             component9.m_itemData.m_shared.m_maxDurability = 300;
             component9.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem9 = new CustomItem(gameObject9, false, new ItemConfig
+            CustomItem customItem9 = new CustomItem(gameObject9, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1605,7 +1605,7 @@ namespace EpicValheimsAdditions
             ItemDrop component10 = gameObject10.GetComponent<ItemDrop>();
             component10.m_itemData.m_shared.m_maxDurability = 300;
             component10.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem10 = new CustomItem(gameObject10, false, new ItemConfig
+            CustomItem customItem10 = new CustomItem(gameObject10, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1633,7 +1633,7 @@ namespace EpicValheimsAdditions
             ItemDrop.m_itemData.m_shared.m_name = "Flametal Shield";
             ItemDrop.m_itemData.m_shared.m_maxDurability = 300;
             ItemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem ShieldFlametalBM = new CustomItem(ShieldFlametal, false, new ItemConfig
+            CustomItem ShieldFlametalBM = new CustomItem(ShieldFlametal, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1658,7 +1658,7 @@ namespace EpicValheimsAdditions
             component11.m_itemData.m_shared.m_variants = 0;
             component11.m_itemData.m_shared.m_maxDurability = 300;
             component11.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem11 = new CustomItem(gameObject11, false, new ItemConfig
+            CustomItem customItem11 = new CustomItem(gameObject11, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1680,7 +1680,7 @@ namespace EpicValheimsAdditions
             ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
             component12.m_itemData.m_shared.m_maxDurability = 300;
             component12.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem12 = new CustomItem(gameObject12, false, new ItemConfig
+            CustomItem customItem12 = new CustomItem(gameObject12, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1706,7 +1706,7 @@ namespace EpicValheimsAdditions
             ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
             component13.m_itemData.m_shared.m_maxDurability = 300;
             component13.m_itemData.m_shared.m_durabilityPerLevel = 75;
-            CustomItem customItem13 = new CustomItem(gameObject13, false, new ItemConfig
+            CustomItem customItem13 = new CustomItem(gameObject13, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1734,7 +1734,7 @@ namespace EpicValheimsAdditions
         private void RegisterDeepAbyssWeapons()
         {
             GameObject gameObject = assetBundle.LoadAsset<GameObject>("TridentDeepAbyss");
-            CustomItem customItem = new CustomItem(gameObject, false, new ItemConfig
+            CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1759,7 +1759,7 @@ namespace EpicValheimsAdditions
             ItemManager.Instance.AddItem(customItem);
 
             GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("BowDeepAbyss");
-            CustomItem customItem2 = new CustomItem(gameObject2, false, new ItemConfig
+            CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1784,7 +1784,7 @@ namespace EpicValheimsAdditions
             ItemManager.Instance.AddItem(customItem2);
 
             GameObject gameObject3 = assetBundle.LoadAsset<GameObject>("GreatSwordDeepAbyss");
-            CustomItem customItem3= new CustomItem(gameObject3, false, new ItemConfig
+            CustomItem customItem3= new CustomItem(gameObject3, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -1817,27 +1817,27 @@ namespace EpicValheimsAdditions
             PrefabManager.Instance.AddPrefab(svartalfrqueenaltar1);
 
             GameObject jotunnaltar = assetBundle.LoadAsset<GameObject>("JotunnAltar");
-            CustomPrefab jotunnaltar1 = new CustomPrefab(jotunnaltar, false);
+            CustomPrefab jotunnaltar1 = new CustomPrefab(jotunnaltar, true);
             PrefabManager.Instance.AddPrefab(jotunnaltar1);
 
             GameObject blazingdamnedonealtar = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneAltar");
-            CustomPrefab blazingdamnedonealtar1 = new CustomPrefab(blazingdamnedonealtar, false);
+            CustomPrefab blazingdamnedonealtar1 = new CustomPrefab(blazingdamnedonealtar, true);
             PrefabManager.Instance.AddPrefab(blazingdamnedonealtar1);
 
             GameObject Vegvisir_SvartalfrQueen = assetBundle.LoadAsset<GameObject>("Vegvisir_SvartalfrQueen");
-            CustomPrefab Vegvisir_SvartalfrQueen1 = new CustomPrefab(Vegvisir_SvartalfrQueen, false);
+            CustomPrefab Vegvisir_SvartalfrQueen1 = new CustomPrefab(Vegvisir_SvartalfrQueen, true);
             PrefabManager.Instance.AddPrefab(Vegvisir_SvartalfrQueen1);
 
             GameObject Vegvisir_Jotunn = assetBundle.LoadAsset<GameObject>("Vegvisir_Jotunn");
-            CustomPrefab Vegvisir_Jotunn1 = new CustomPrefab(Vegvisir_Jotunn, false);
+            CustomPrefab Vegvisir_Jotunn1 = new CustomPrefab(Vegvisir_Jotunn, true);
             PrefabManager.Instance.AddPrefab(Vegvisir_Jotunn1);
 
             GameObject Vegvisir_BlazingDamnedOne = assetBundle.LoadAsset<GameObject>("Vegvisir_BlazingDamnedOne");
-            CustomPrefab Vegvisir_BlazingDamnedOne1 = new CustomPrefab(Vegvisir_BlazingDamnedOne, false);
+            CustomPrefab Vegvisir_BlazingDamnedOne1 = new CustomPrefab(Vegvisir_BlazingDamnedOne, true);
             PrefabManager.Instance.AddPrefab(Vegvisir_BlazingDamnedOne1);
 
             GameObject fenrirsheart = assetBundle.LoadAsset<GameObject>("FenrirsHeart");
-            CustomItem FenrirsHeart = new CustomItem(fenrirsheart, false, new ItemConfig
+            CustomItem FenrirsHeart = new CustomItem(fenrirsheart, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_alchemystation",
@@ -1855,7 +1855,7 @@ namespace EpicValheimsAdditions
             ItemManager.Instance.AddItem(FenrirsHeart);
 
             GameObject ymirsSoulEssence = assetBundle.LoadAsset<GameObject>("YmirsSoulEssence");
-            CustomItem YmirsSoulEssence = new CustomItem(ymirsSoulEssence, false, new ItemConfig
+            CustomItem YmirsSoulEssence = new CustomItem(ymirsSoulEssence, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_alchemystation",
@@ -1877,7 +1877,7 @@ namespace EpicValheimsAdditions
             ItemManager.Instance.AddItem(YmirsSoulEssence);
 
             GameObject cursedEffigy = assetBundle.LoadAsset<GameObject>("CursedEffigy");
-            CustomItem CursedEffigy = new CustomItem(cursedEffigy, false, new ItemConfig
+            CustomItem CursedEffigy = new CustomItem(cursedEffigy, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_alchemystation",
@@ -1922,71 +1922,71 @@ namespace EpicValheimsAdditions
 
 
             GameObject SvartalfrQueenGreatSword = assetBundle.LoadAsset<GameObject>("SvartalfrQueenGreatSword");
-            CustomItem SvartalfrQueenGreatSword1 = new CustomItem(SvartalfrQueenGreatSword, false);
+            CustomItem SvartalfrQueenGreatSword1 = new CustomItem(SvartalfrQueenGreatSword, true);
             ItemManager.Instance.AddItem(SvartalfrQueenGreatSword1);
             GameObject SvartalfrQueenBow = assetBundle.LoadAsset<GameObject>("SvartalfrQueenBow");
-            CustomItem SvartalfrQueenBow1 = new CustomItem(SvartalfrQueenBow, false);
+            CustomItem SvartalfrQueenBow1 = new CustomItem(SvartalfrQueenBow, true);
             ItemManager.Instance.AddItem(SvartalfrQueenBow1);
             GameObject SvartalfrQueenBowArrowStorm = assetBundle.LoadAsset<GameObject>("SvartalfrQueenBowArrowStorm");
-            CustomItem SvartalfrQueenBowArrowStorm1 = new CustomItem(SvartalfrQueenBowArrowStorm, false);
+            CustomItem SvartalfrQueenBowArrowStorm1 = new CustomItem(SvartalfrQueenBowArrowStorm, true);
             ItemManager.Instance.AddItem(SvartalfrQueenBowArrowStorm1);
             GameObject SvartalfrQueen_rootspawn = assetBundle.LoadAsset<GameObject>("SvartalfrQueen_rootspawn");
-            CustomItem SvartalfrQueen_rootspawn1 = new CustomItem(SvartalfrQueen_rootspawn, false);
+            CustomItem SvartalfrQueen_rootspawn1 = new CustomItem(SvartalfrQueen_rootspawn, true);
             ItemManager.Instance.AddItem(SvartalfrQueen_rootspawn1);
 
             GameObject Jotunn_Groundslam = assetBundle.LoadAsset<GameObject>("Jotunn_Groundslam");
-            CustomItem Jotunn_Groundslam1 = new CustomItem(Jotunn_Groundslam, false);
+            CustomItem Jotunn_Groundslam1 = new CustomItem(Jotunn_Groundslam, true);
             ItemManager.Instance.AddItem(Jotunn_Groundslam1);
             GameObject Jotunn_Groundslam2 = assetBundle.LoadAsset<GameObject>("Jotunn_Groundslam2");
-            CustomItem Jotunn_Groundslam21 = new CustomItem(Jotunn_Groundslam2, false);
+            CustomItem Jotunn_Groundslam21 = new CustomItem(Jotunn_Groundslam2, true);
             ItemManager.Instance.AddItem(Jotunn_Groundslam21);
             GameObject Jotunn_Shoot = assetBundle.LoadAsset<GameObject>("Jotunn_Shoot");
-            CustomItem Jotunn_Shoot1 = new CustomItem(Jotunn_Shoot, false);
+            CustomItem Jotunn_Shoot1 = new CustomItem(Jotunn_Shoot, true);
             ItemManager.Instance.AddItem(Jotunn_Shoot1);
 
             GameObject BlazingDamnedOneMace = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace");
-            CustomItem BlazingDamnedOneMace1 = new CustomItem(BlazingDamnedOneMace, false);
+            CustomItem BlazingDamnedOneMace1 = new CustomItem(BlazingDamnedOneMace, true);
             ItemManager.Instance.AddItem(BlazingDamnedOneMace1);
             GameObject BlazingDamnedOneMacetwo = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace2");
-            CustomItem BlazingDamnedOneMace2 = new CustomItem(BlazingDamnedOneMacetwo, false);
+            CustomItem BlazingDamnedOneMace2 = new CustomItem(BlazingDamnedOneMacetwo, true);
             ItemManager.Instance.AddItem(BlazingDamnedOneMace2);
             GameObject BlazingDamnedOneMacethree = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace3");
-            CustomItem BlazingDamnedOneMace3 = new CustomItem(BlazingDamnedOneMacethree, false);
+            CustomItem BlazingDamnedOneMace3 = new CustomItem(BlazingDamnedOneMacethree, true);
             ItemManager.Instance.AddItem(BlazingDamnedOneMace3);
             GameObject BlazingDamnedOneMacefour = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace4");
-            CustomItem BlazingDamnedOneMace4 = new CustomItem(BlazingDamnedOneMacefour, false);
+            CustomItem BlazingDamnedOneMace4 = new CustomItem(BlazingDamnedOneMacefour, true);
             ItemManager.Instance.AddItem(BlazingDamnedOneMace4);
             GameObject BlazingDamnedOneShield = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneShield");
-            CustomItem BlazingDamnedOneShield1 = new CustomItem(BlazingDamnedOneShield, false);
+            CustomItem BlazingDamnedOneShield1 = new CustomItem(BlazingDamnedOneShield, true);
             ItemManager.Instance.AddItem(BlazingDamnedOneShield1);
             GameObject EVA_BlazingHelm = assetBundle.LoadAsset<GameObject>("EVA_BlazingHelm");
-            CustomItem EVA_BlazingHelm1 = new CustomItem(EVA_BlazingHelm, false);
+            CustomItem EVA_BlazingHelm1 = new CustomItem(EVA_BlazingHelm, true);
             ItemManager.Instance.AddItem(EVA_BlazingHelm1);
             GameObject EVA_BlazingChest = assetBundle.LoadAsset<GameObject>("EVA_BlazingChest");
-            CustomItem EVA_BlazingChest1 = new CustomItem(EVA_BlazingChest, false);
+            CustomItem EVA_BlazingChest1 = new CustomItem(EVA_BlazingChest, true);
             ItemManager.Instance.AddItem(EVA_BlazingChest1);
             GameObject EVA_BlazingBoots = assetBundle.LoadAsset<GameObject>("EVA_BlazingBoots");
-            CustomItem EVA_BlazingBoots1 = new CustomItem(EVA_BlazingBoots, false);
+            CustomItem EVA_BlazingBoots1 = new CustomItem(EVA_BlazingBoots, true);
             ItemManager.Instance.AddItem(EVA_BlazingBoots1);
             GameObject Blazing_Nova = assetBundle.LoadAsset<GameObject>("Blazing_Nova");
-            CustomItem Blazing_Nova1 = new CustomItem(Blazing_Nova, false);
+            CustomItem Blazing_Nova1 = new CustomItem(Blazing_Nova, true);
             ItemManager.Instance.AddItem(Blazing_Nova1);
             GameObject Blazing_Meteors = assetBundle.LoadAsset<GameObject>("Blazing_Meteors");
-            CustomItem Blazing_Meteors1 = new CustomItem(Blazing_Meteors, false);
+            CustomItem Blazing_Meteors1 = new CustomItem(Blazing_Meteors, true);
             ItemManager.Instance.AddItem(Blazing_Meteors1);
             GameObject Blazing_Shoot = assetBundle.LoadAsset<GameObject>("Blazing_Shoot");
-            CustomItem Blazing_Shoot1 = new CustomItem(Blazing_Shoot, false);
+            CustomItem Blazing_Shoot1 = new CustomItem(Blazing_Shoot, true);
             ItemManager.Instance.AddItem(Blazing_Shoot1);
 
 
             GameObject TrophySvartalfrQueen = assetBundle.LoadAsset<GameObject>("TrophySvartalfrQueen");
-            CustomItem TrophySvartalfrQueen1 = new CustomItem(TrophySvartalfrQueen, false);
+            CustomItem TrophySvartalfrQueen1 = new CustomItem(TrophySvartalfrQueen, true);
             ItemManager.Instance.AddItem(TrophySvartalfrQueen1);
             GameObject TrophyJotunn = assetBundle.LoadAsset<GameObject>("TrophyJotunn");
-            CustomItem TrophyJotunn1 = new CustomItem(TrophyJotunn, false);
+            CustomItem TrophyJotunn1 = new CustomItem(TrophyJotunn, true);
             ItemManager.Instance.AddItem(TrophyJotunn1);
             GameObject TrophyBlazingDamnedOne = assetBundle.LoadAsset<GameObject>("TrophyBlazingDamnedOne");
-            CustomItem TrophyBlazingDamnedOne1 = new CustomItem(TrophyBlazingDamnedOne, false);
+            CustomItem TrophyBlazingDamnedOne1 = new CustomItem(TrophyBlazingDamnedOne, true);
             ItemManager.Instance.AddItem(TrophyBlazingDamnedOne1);
 
             Jotunn.Logger.LogInfo("Loaded BossStuff");
@@ -1995,23 +1995,27 @@ namespace EpicValheimsAdditions
         private void RegisterMiscItems()
         {
             GameObject errordrop = assetBundle.LoadAsset<GameObject>("ErrorDrop");
-            CustomItem ErrorDrop = new CustomItem(errordrop, false);
+            CustomItem ErrorDrop = new CustomItem(errordrop, true);
             ItemManager.Instance.AddItem(ErrorDrop);
 
+            GameObject EVA_AdminFood = assetBundle.LoadAsset<GameObject>("EVA_AdminFood");
+            CustomItem EVA_AdminFood1 = new CustomItem(EVA_AdminFood, true);
+            ItemManager.Instance.AddItem(EVA_AdminFood1);
+
             GameObject darkfrometal = assetBundle.LoadAsset<GameObject>("FrostInfusedDarkMetal");
-            CustomItem darkfrometal1 = new CustomItem(darkfrometal, false);
+            CustomItem darkfrometal1 = new CustomItem(darkfrometal, true);
             ItemManager.Instance.AddItem(darkfrometal1);
 
             GameObject burningfragment = assetBundle.LoadAsset<GameObject>("BurningWorldTreeFragment");
-            CustomItem burningfragment1 = new CustomItem(burningfragment, false);
+            CustomItem burningfragment1 = new CustomItem(burningfragment, true);
             ItemManager.Instance.AddItem(burningfragment1);
 
             GameObject TreeFragment = assetBundle.LoadAsset<GameObject>("WorldTreeFragment");
-            CustomItem CursedWorldTreeFragment = new CustomItem(TreeFragment, false);
+            CustomItem CursedWorldTreeFragment = new CustomItem(TreeFragment, true);
             ItemManager.Instance.AddItem(CursedWorldTreeFragment);
 
             GameObject primice = assetBundle.LoadAsset<GameObject>("PrimordialIce");
-            CustomItem Primice = new CustomItem(primice, false);
+            CustomItem Primice = new CustomItem(primice, true);
             ItemManager.Instance.AddItem(Primice);
 
             Jotunn.Logger.LogInfo("Loaded MiscItems");
