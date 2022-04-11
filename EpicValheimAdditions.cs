@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.7.5";
+        private const string ModVersion = "1.7.6";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -32,6 +32,7 @@ namespace EpicValheimsAdditions
             private static void Postfix(ZNetScene __instance)
             {
                 __instance.m_prefabs.Find(p => p.name == "HugeRoot1").GetComponent<Destructible>().enabled = true;
+                Core.Init();
             }
         }
         [HarmonyPatch(typeof(OfferingBowl), "Awake")]
@@ -2047,10 +2048,11 @@ namespace EpicValheimsAdditions
             var bossConfigs = new List<BossConfig>();
 
             // SvartalFrQueen
+            // (int)SvartalfrQueenPrefab.m_health
             var SvartalfrQueenConfig = new BossConfig();
             var SvartalfrQueenPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("SvartalfrQueen");
             SvartalfrQueenConfig.BossPrefabName = "SvartalfrQueen";
-            SvartalfrQueenConfig.Health = (int)SvartalfrQueenPrefab.m_health;
+            SvartalfrQueenConfig.Health = 15000;
 
             SvartalfrQueenConfig.Attacks = new List<CustomAttack>();
             var svartalfrQueenStandardAttacks = new List<string> { "SvartalfrQueenGreatSword", "SvartalfrQueenBow" };
@@ -2092,10 +2094,11 @@ namespace EpicValheimsAdditions
             bossConfigs.Add(SvartalfrQueenConfig);
 
             // Jotunn
+            // (int)JotunnPrefab.m_health
             var JotunnConfig = new BossConfig();
             var JotunnPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Jotunn");
             JotunnConfig.BossPrefabName = "Jotunn";
-            JotunnConfig.Health = (int)JotunnPrefab.m_health;
+            JotunnConfig.Health = 22500;
 
             JotunnConfig.Attacks = new List<CustomAttack>();
             var jotunnStandardAttacks = new List<string> { "Jotunn_Groundslam", "Jotunn_Groundslam2", "Jotunn_Shoot" };
@@ -2103,10 +2106,11 @@ namespace EpicValheimsAdditions
             bossConfigs.Add(JotunnConfig);
 
             // BlazingDamnedOne
+            // (int)BlazingDamnedOne.m_health
             var BlazingDamnedOneConfig = new BossConfig();
             var BlazingDamnedOne = PrefabManager.Cache.GetPrefab<Humanoid>("BlazingDamnedOne");
             BlazingDamnedOneConfig.BossPrefabName = "BlazingDamnedOne";
-            BlazingDamnedOneConfig.Health = (int)BlazingDamnedOne.m_health;
+            BlazingDamnedOneConfig.Health = 30000; 
 
             BlazingDamnedOneConfig.Attacks = new List<CustomAttack>();
             var blazingDamnedStandardAttacks = new List<string> { "BlazingDamnedOneMace", "BlazingDamnedOneMace2", "BlazingDamnedOneMace3", "BlazingDamnedOneMace4", "Blazing_Nova", "Blazing_Shoot" };
