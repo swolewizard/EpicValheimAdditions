@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.7.6";
+        private const string ModVersion = "1.7.7";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -32,7 +32,6 @@ namespace EpicValheimsAdditions
             private static void Postfix(ZNetScene __instance)
             {
                 __instance.m_prefabs.Find(p => p.name == "HugeRoot1").GetComponent<Destructible>().enabled = true;
-                Core.Init();
             }
         }
         [HarmonyPatch(typeof(OfferingBowl), "Awake")]
