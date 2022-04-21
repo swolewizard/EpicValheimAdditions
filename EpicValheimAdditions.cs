@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.7.7";
+        private const string ModVersion = "1.7.8";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -148,7 +148,9 @@ namespace EpicValheimsAdditions
             this.CustomConversions();
             this.LoadConfig();
             ZoneManager.OnVanillaLocationsAvailable += AddLocations;
-            Core.Init();
+            ZoneManager.OnVanillaLocationsAvailable += ModDrops;
+            ZoneManager.OnVanillaLocationsAvailable += ModThorsForgeLevel;
+            ZoneManager.OnVanillaLocationsAvailable += ModAlchemyLevel;
 
         }
 
@@ -157,14 +159,6 @@ namespace EpicValheimsAdditions
             Jotunn.Logger.LogInfo("Loading...");
             assetBundle = AssetUtils.LoadAssetBundleFromResources("eva_assets", typeof(Core).Assembly);
             Jotunn.Logger.LogInfo("Loaded Prefabs");
-        }
-
-        internal static void Init()
-        {
-            ItemManager.OnItemsRegistered += ModDrops;
-            ItemManager.OnItemsRegistered += Foods;
-            ItemManager.OnItemsRegistered += ModThorsForgeLevel;
-            ItemManager.OnItemsRegistered += ModAlchemyLevel;
         }
 
         private void AddLocations()
@@ -306,7 +300,7 @@ namespace EpicValheimsAdditions
             Jotunn.Logger.LogInfo("Loaded Vegetation");
         }
 
-        private static void ModDrops()
+        private void ModDrops()
         {
             DropOnDestroyed prefab1a = PrefabManager.Cache.GetPrefab<DropOnDestroyed>("HugeRoot1");
             Destructible prefab1b = PrefabManager.Cache.GetPrefab<Destructible>("HugeRoot1");
@@ -344,23 +338,8 @@ namespace EpicValheimsAdditions
             prefab2b.m_dropItems.m_dropMax = 2;
             prefab2b.m_dropItems.m_dropChance = 0.05f;
 
-            Jotunn.Logger.LogInfo("Updated Drops");
-            ItemManager.OnItemsRegistered -= ModDrops;
+            Jotunn.Logger.LogInfo("Updated EVA Resource drop tables");
         }
-
-        private static void Foods()
-        {
-            ItemDrop dandelion = PrefabManager.Cache.GetPrefab<ItemDrop>("Dandelion");
-            dandelion.m_itemData.m_shared.m_itemType = ItemDrop.ItemData.ItemType.Consumable;
-            dandelion.m_itemData.m_shared.m_food = 5;
-            dandelion.m_itemData.m_shared.m_foodStamina = 15;
-            dandelion.m_itemData.m_shared.m_foodBurnTime = 900;
-            dandelion.m_itemData.m_shared.m_foodRegen = 1;
-
-            Jotunn.Logger.LogInfo("Updated Food");
-            ItemManager.OnItemsRegistered -= Foods;
-        }
-
         private void CreateCraftingPieces()
         {
             GameObject gameObject = assetBundle.LoadAsset<GameObject>("piece_alchemystation");
@@ -428,7 +407,7 @@ namespace EpicValheimsAdditions
             Jotunn.Logger.LogInfo("Loaded CraftingPieces");
         }
 
-        private static void ModThorsForgeLevel()
+        private void ModThorsForgeLevel()
         {
             string piece = "piece_thorsforge";
             StationExtension station = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext1").AddComponent<StationExtension>();
@@ -456,10 +435,9 @@ namespace EpicValheimsAdditions
             station5.m_maxStationDistance = 50;
             station5.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
             Jotunn.Logger.LogInfo("Updated Thors Forge level");
-            ItemManager.OnItemsRegistered -= ModThorsForgeLevel;
         }
 
-        private static void ModAlchemyLevel()
+        private void ModAlchemyLevel()
         {
             string piece = "piece_alchemystation";
             StationExtension station = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext1").AddComponent<StationExtension>();
@@ -487,7 +465,6 @@ namespace EpicValheimsAdditions
             station5.m_maxStationDistance = 50;
             station5.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
             Jotunn.Logger.LogInfo("Updated Alchemystation level");
-            ItemManager.OnItemsRegistered -= ModAlchemyLevel;
 
         }
 
@@ -537,7 +514,7 @@ namespace EpicValheimsAdditions
                                 Amount = 5
                         },
                         new RequirementConfig {
-                            Item = "TrophyBlazingDamnedOne",
+                            Item = "TrophyHelDemon",
                                 Amount = 1
                         }
                     }
@@ -953,7 +930,7 @@ namespace EpicValheimsAdditions
                                 AmountPerLevel = 8
                         },
                         new RequirementConfig {
-                            Item = "TrophySvartalfrQueen",
+                            Item = "TrophySvartalfarQueen",
                                 Amount = 1
                         }
                     }
@@ -984,7 +961,7 @@ namespace EpicValheimsAdditions
                                 AmountPerLevel = 8
                         },
                         new RequirementConfig {
-                            Item = "TrophySvartalfrQueen",
+                            Item = "TrophySvartalfarQueen",
                                 Amount = 1
                         }
                     }
@@ -1696,7 +1673,7 @@ namespace EpicValheimsAdditions
                                 AmountPerLevel = 2
                         },
                         new RequirementConfig {
-                            Item = "TrophyBlazingDamnedOne",
+                            Item = "TrophyHelDemon",
                                 Amount = 1
                         }
                     }
@@ -1722,7 +1699,7 @@ namespace EpicValheimsAdditions
                                 AmountPerLevel = 2
                         },
                         new RequirementConfig {
-                            Item = "TrophyBlazingDamnedOne",
+                            Item = "TrophyHelDemon",
                                 Amount = 1
                         }
                     }
@@ -1907,32 +1884,32 @@ namespace EpicValheimsAdditions
             GameObject Golden_Wraith_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Wraith_Miniboss");
             CustomPrefab Golden_Wraith_Miniboss1 = new CustomPrefab(Golden_Wraith_Miniboss, true);
             PrefabManager.Instance.AddPrefab(Golden_Wraith_Miniboss1);
-            GameObject SvartalfrQueen = assetBundle.LoadAsset<GameObject>("SvartalfrQueen");
-            CustomPrefab SvartalfrQueen1 = new CustomPrefab(SvartalfrQueen, true);
-            PrefabManager.Instance.AddPrefab(SvartalfrQueen1);
+            GameObject SvartalfarQueen = assetBundle.LoadAsset<GameObject>("SvartalfarQueen");
+            CustomPrefab SvartalfarQueen1 = new CustomPrefab(SvartalfarQueen, true);
+            PrefabManager.Instance.AddPrefab(SvartalfarQueen1);
             GameObject SvarTentaRoot = assetBundle.LoadAsset<GameObject>("SvarTentaRoot");
             CustomPrefab SvarTentaRoot1 = new CustomPrefab(SvarTentaRoot, true);
             PrefabManager.Instance.AddPrefab(SvarTentaRoot);
             GameObject JotunnBoss = assetBundle.LoadAsset<GameObject>("Jotunn");
             CustomPrefab JotunnBoss1 = new CustomPrefab(JotunnBoss, true);
             PrefabManager.Instance.AddPrefab(JotunnBoss1);
-            GameObject BlazingDamnedOne = assetBundle.LoadAsset<GameObject>("BlazingDamnedOne");
-            CustomPrefab BlazingDamnedOne1 = new CustomPrefab(BlazingDamnedOne, true);
-            PrefabManager.Instance.AddPrefab(BlazingDamnedOne1);
+            GameObject HelDemon = assetBundle.LoadAsset<GameObject>("HelDemon");
+            CustomPrefab HelDemon1 = new CustomPrefab(HelDemon, true);
+            PrefabManager.Instance.AddPrefab(HelDemon1);
 
 
-            GameObject SvartalfrQueenGreatSword = assetBundle.LoadAsset<GameObject>("SvartalfrQueenGreatSword");
-            CustomItem SvartalfrQueenGreatSword1 = new CustomItem(SvartalfrQueenGreatSword, true);
-            ItemManager.Instance.AddItem(SvartalfrQueenGreatSword1);
-            GameObject SvartalfrQueenBow = assetBundle.LoadAsset<GameObject>("SvartalfrQueenBow");
-            CustomItem SvartalfrQueenBow1 = new CustomItem(SvartalfrQueenBow, true);
-            ItemManager.Instance.AddItem(SvartalfrQueenBow1);
-            GameObject SvartalfrQueenBowArrowStorm = assetBundle.LoadAsset<GameObject>("SvartalfrQueenBowArrowStorm");
-            CustomItem SvartalfrQueenBowArrowStorm1 = new CustomItem(SvartalfrQueenBowArrowStorm, true);
-            ItemManager.Instance.AddItem(SvartalfrQueenBowArrowStorm1);
-            GameObject SvartalfrQueen_rootspawn = assetBundle.LoadAsset<GameObject>("SvartalfrQueen_rootspawn");
-            CustomItem SvartalfrQueen_rootspawn1 = new CustomItem(SvartalfrQueen_rootspawn, true);
-            ItemManager.Instance.AddItem(SvartalfrQueen_rootspawn1);
+            GameObject SvartalfarQueenGreatSword = assetBundle.LoadAsset<GameObject>("SvartalfarQueenGreatSword");
+            CustomItem SvartalfarQueenGreatSword1 = new CustomItem(SvartalfarQueenGreatSword, true);
+            ItemManager.Instance.AddItem(SvartalfarQueenGreatSword1);
+            GameObject SvartalfarQueenBow = assetBundle.LoadAsset<GameObject>("SvartalfarQueenBow");
+            CustomItem SvartalfarQueenBow1 = new CustomItem(SvartalfarQueenBow, true);
+            ItemManager.Instance.AddItem(SvartalfarQueenBow1);
+            GameObject SvartalfarQueenBowArrowStorm = assetBundle.LoadAsset<GameObject>("SvartalfarQueenBowArrowStorm");
+            CustomItem SvartalfarQueenBowArrowStorm1 = new CustomItem(SvartalfarQueenBowArrowStorm, true);
+            ItemManager.Instance.AddItem(SvartalfarQueenBowArrowStorm1);
+            GameObject SvartalfarQueen_rootspawn = assetBundle.LoadAsset<GameObject>("SvartalfarQueen_rootspawn");
+            CustomItem SvartalfarQueen_rootspawn1 = new CustomItem(SvartalfarQueen_rootspawn, true);
+            ItemManager.Instance.AddItem(SvartalfarQueen_rootspawn1);
 
             GameObject Jotunn_Groundslam = assetBundle.LoadAsset<GameObject>("Jotunn_Groundslam");
             CustomItem Jotunn_Groundslam1 = new CustomItem(Jotunn_Groundslam, true);
@@ -1944,21 +1921,21 @@ namespace EpicValheimsAdditions
             CustomItem Jotunn_Shoot1 = new CustomItem(Jotunn_Shoot, true);
             ItemManager.Instance.AddItem(Jotunn_Shoot1);
 
-            GameObject BlazingDamnedOneMace = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace");
-            CustomItem BlazingDamnedOneMace1 = new CustomItem(BlazingDamnedOneMace, true);
-            ItemManager.Instance.AddItem(BlazingDamnedOneMace1);
-            GameObject BlazingDamnedOneMacetwo = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace2");
-            CustomItem BlazingDamnedOneMace2 = new CustomItem(BlazingDamnedOneMacetwo, true);
-            ItemManager.Instance.AddItem(BlazingDamnedOneMace2);
-            GameObject BlazingDamnedOneMacethree = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace3");
-            CustomItem BlazingDamnedOneMace3 = new CustomItem(BlazingDamnedOneMacethree, true);
-            ItemManager.Instance.AddItem(BlazingDamnedOneMace3);
-            GameObject BlazingDamnedOneMacefour = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneMace4");
-            CustomItem BlazingDamnedOneMace4 = new CustomItem(BlazingDamnedOneMacefour, true);
-            ItemManager.Instance.AddItem(BlazingDamnedOneMace4);
-            GameObject BlazingDamnedOneShield = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneShield");
-            CustomItem BlazingDamnedOneShield1 = new CustomItem(BlazingDamnedOneShield, true);
-            ItemManager.Instance.AddItem(BlazingDamnedOneShield1);
+            GameObject BlazingMace = assetBundle.LoadAsset<GameObject>("BlazingMace");
+            CustomItem BlazingMace1 = new CustomItem(BlazingMace, true);
+            ItemManager.Instance.AddItem(BlazingMace1);
+            GameObject BlazingMacetwo = assetBundle.LoadAsset<GameObject>("BlazingMace2");
+            CustomItem BlazingMace2 = new CustomItem(BlazingMacetwo, true);
+            ItemManager.Instance.AddItem(BlazingMace2);
+            GameObject BlazingMacethree = assetBundle.LoadAsset<GameObject>("BlazingMace3");
+            CustomItem BlazingMace3 = new CustomItem(BlazingMacethree, true);
+            ItemManager.Instance.AddItem(BlazingMace3);
+            GameObject BlazingMacefour = assetBundle.LoadAsset<GameObject>("BlazingMace4");
+            CustomItem BlazingMace4 = new CustomItem(BlazingMacefour, true);
+            ItemManager.Instance.AddItem(BlazingMace4);
+            GameObject BlazingShield = assetBundle.LoadAsset<GameObject>("BlazingShield");
+            CustomItem BlazingShield1 = new CustomItem(BlazingShield, true);
+            ItemManager.Instance.AddItem(BlazingShield1);
             GameObject EVA_BlazingHelm = assetBundle.LoadAsset<GameObject>("EVA_BlazingHelm");
             CustomItem EVA_BlazingHelm1 = new CustomItem(EVA_BlazingHelm, true);
             ItemManager.Instance.AddItem(EVA_BlazingHelm1);
@@ -1979,15 +1956,15 @@ namespace EpicValheimsAdditions
             ItemManager.Instance.AddItem(Blazing_Shoot1);
 
 
-            GameObject TrophySvartalfrQueen = assetBundle.LoadAsset<GameObject>("TrophySvartalfrQueen");
-            CustomItem TrophySvartalfrQueen1 = new CustomItem(TrophySvartalfrQueen, true);
-            ItemManager.Instance.AddItem(TrophySvartalfrQueen1);
+            GameObject TrophySvartalfarQueen = assetBundle.LoadAsset<GameObject>("TrophySvartalfarQueen");
+            CustomItem TrophySvartalfarQueen1 = new CustomItem(TrophySvartalfarQueen, true);
+            ItemManager.Instance.AddItem(TrophySvartalfarQueen1);
             GameObject TrophyJotunn = assetBundle.LoadAsset<GameObject>("TrophyJotunn");
             CustomItem TrophyJotunn1 = new CustomItem(TrophyJotunn, true);
             ItemManager.Instance.AddItem(TrophyJotunn1);
-            GameObject TrophyBlazingDamnedOne = assetBundle.LoadAsset<GameObject>("TrophyBlazingDamnedOne");
-            CustomItem TrophyBlazingDamnedOne1 = new CustomItem(TrophyBlazingDamnedOne, true);
-            ItemManager.Instance.AddItem(TrophyBlazingDamnedOne1);
+            GameObject TrophyHelDemon = assetBundle.LoadAsset<GameObject>("TrophyHelDemon");
+            CustomItem TrophyHelDemon1 = new CustomItem(TrophyHelDemon, true);
+            ItemManager.Instance.AddItem(TrophyHelDemon1);
 
             Jotunn.Logger.LogInfo("Loaded BossStuff");
         }
@@ -2046,51 +2023,51 @@ namespace EpicValheimsAdditions
 
             var bossConfigs = new List<BossConfig>();
 
-            // SvartalFrQueen
-            // (int)SvartalfrQueenPrefab.m_health
-            var SvartalfrQueenConfig = new BossConfig();
-            var SvartalfrQueenPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("SvartalfrQueen");
-            SvartalfrQueenConfig.BossPrefabName = "SvartalfrQueen";
-            SvartalfrQueenConfig.Health = 15000;
+            // SvartalfarQueen
+            // (int)SvartalfarQueenPrefab.m_health
+            var SvartalfarQueenConfig = new BossConfig();
+            var SvartalfarQueenPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("SvartalfarQueen");
+            SvartalfarQueenConfig.BossPrefabName = "SvartalfarQueen";
+            SvartalfarQueenConfig.Health = 15000;
 
-            SvartalfrQueenConfig.Attacks = new List<CustomAttack>();
-            var svartalfrQueenStandardAttacks = new List<string> { "SvartalfrQueenGreatSword", "SvartalfrQueenBow" };
-            AddDefaultAttacks(SvartalfrQueenConfig, svartalfrQueenStandardAttacks);
-            var SvartalfrQueenRootspawn = PrefabManager.Cache.GetPrefab<ItemDrop>("SvartalfrQueen_rootspawn");
-            SvartalfrQueenConfig.Attacks.Add(new CustomAttack
+            SvartalfarQueenConfig.Attacks = new List<CustomAttack>();
+            var SvartalfarQueenStandardAttacks = new List<string> { "SvartalfarQueenGreatSword", "SvartalfarQueenBow" };
+            AddDefaultAttacks(SvartalfarQueenConfig, SvartalfarQueenStandardAttacks);
+            var SvartalfarQueenRootspawn = PrefabManager.Cache.GetPrefab<ItemDrop>("SvartalfarQueen_rootspawn");
+            SvartalfarQueenConfig.Attacks.Add(new CustomAttack
             {
-                AttackName = SvartalfrQueenRootspawn.name,
-                AttackAnimation = SvartalfrQueenRootspawn.m_itemData.m_shared.m_attack.m_attackAnimation,
-                AiAttackRange = SvartalfrQueenRootspawn.m_itemData.m_shared.m_aiAttackRange,
-                AiAttackRangeMin = SvartalfrQueenRootspawn.m_itemData.m_shared.m_aiAttackRangeMin,
-                AiAttackInterval = SvartalfrQueenRootspawn.m_itemData.m_shared.m_aiAttackInterval
+                AttackName = SvartalfarQueenRootspawn.name,
+                AttackAnimation = SvartalfarQueenRootspawn.m_itemData.m_shared.m_attack.m_attackAnimation,
+                AiAttackRange = SvartalfarQueenRootspawn.m_itemData.m_shared.m_aiAttackRange,
+                AiAttackRangeMin = SvartalfarQueenRootspawn.m_itemData.m_shared.m_aiAttackRangeMin,
+                AiAttackInterval = SvartalfarQueenRootspawn.m_itemData.m_shared.m_aiAttackInterval
             });
-            var SvartalfrQueenRootspawn2 = PrefabManager.Cache.GetPrefab<ItemDrop>("SvarTentaRoot_attack");
-            SvartalfrQueenConfig.Attacks.Add(new CustomAttack
+            var SvartalfarQueenRootspawn2 = PrefabManager.Cache.GetPrefab<ItemDrop>("SvarTentaRoot_attack");
+            SvartalfarQueenConfig.Attacks.Add(new CustomAttack
             {
-                AttackName = SvartalfrQueenRootspawn2.name,
-                AiAttackRange = SvartalfrQueenRootspawn2.m_itemData.m_shared.m_aiAttackRange,
-                AiAttackRangeMin = SvartalfrQueenRootspawn2.m_itemData.m_shared.m_aiAttackRangeMin,
-                AiAttackInterval = SvartalfrQueenRootspawn2.m_itemData.m_shared.m_aiAttackInterval,
-                Damages = SvartalfrQueenRootspawn2.m_itemData.m_shared.m_damages
+                AttackName = SvartalfarQueenRootspawn2.name,
+                AiAttackRange = SvartalfarQueenRootspawn2.m_itemData.m_shared.m_aiAttackRange,
+                AiAttackRangeMin = SvartalfarQueenRootspawn2.m_itemData.m_shared.m_aiAttackRangeMin,
+                AiAttackInterval = SvartalfarQueenRootspawn2.m_itemData.m_shared.m_aiAttackInterval,
+                Damages = SvartalfarQueenRootspawn2.m_itemData.m_shared.m_damages
             });
-            var SvartalfrQueenBowArrowStorm = PrefabManager.Cache.GetPrefab<ItemDrop>("SvartalfrQueenBowArrowStorm");
-            SvartalfrQueenConfig.Attacks.Add(new CustomAttack
+            var SvartalfarQueenBowArrowStorm = PrefabManager.Cache.GetPrefab<ItemDrop>("SvartalfarQueenBowArrowStorm");
+            SvartalfarQueenConfig.Attacks.Add(new CustomAttack
             {
-                AttackName = SvartalfrQueenBowArrowStorm.name,
-                AttackAnimation = SvartalfrQueenBowArrowStorm.m_itemData.m_shared.m_attack.m_attackAnimation,
-                AiAttackRange = SvartalfrQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackRange,
-                AiAttackRangeMin = SvartalfrQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackRangeMin,
-                AiAttackInterval = SvartalfrQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackInterval
+                AttackName = SvartalfarQueenBowArrowStorm.name,
+                AttackAnimation = SvartalfarQueenBowArrowStorm.m_itemData.m_shared.m_attack.m_attackAnimation,
+                AiAttackRange = SvartalfarQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackRange,
+                AiAttackRangeMin = SvartalfarQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackRangeMin,
+                AiAttackInterval = SvartalfarQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackInterval
             });
             var bow_projectile_svar = PrefabManager.Cache.GetPrefab<Projectile>("bow_projectile_svar");
-            SvartalfrQueenConfig.Attacks.Add(new CustomAttack
+            SvartalfarQueenConfig.Attacks.Add(new CustomAttack
             {
                 AttackName = bow_projectile_svar.name,
                 Damages = bow_projectile_svar.m_damage
             });
 
-            bossConfigs.Add(SvartalfrQueenConfig);
+            bossConfigs.Add(SvartalfarQueenConfig);
 
             // Jotunn
             // (int)JotunnPrefab.m_health
@@ -2104,18 +2081,18 @@ namespace EpicValheimsAdditions
             AddDefaultAttacks(JotunnConfig, jotunnStandardAttacks);
             bossConfigs.Add(JotunnConfig);
 
-            // BlazingDamnedOne
-            // (int)BlazingDamnedOne.m_health
-            var BlazingDamnedOneConfig = new BossConfig();
-            var BlazingDamnedOne = PrefabManager.Cache.GetPrefab<Humanoid>("BlazingDamnedOne");
-            BlazingDamnedOneConfig.BossPrefabName = "BlazingDamnedOne";
-            BlazingDamnedOneConfig.Health = 30000; 
+            // HelDemon
+            // (int)HelDemon.m_health
+            var HelDemonConfig = new BossConfig();
+            var HelDemon = PrefabManager.Cache.GetPrefab<Humanoid>("HelDemon");
+            HelDemonConfig.BossPrefabName = "HelDemon";
+            HelDemonConfig.Health = 30000; 
 
-            BlazingDamnedOneConfig.Attacks = new List<CustomAttack>();
-            var blazingDamnedStandardAttacks = new List<string> { "BlazingDamnedOneMace", "BlazingDamnedOneMace2", "BlazingDamnedOneMace3", "BlazingDamnedOneMace4", "Blazing_Nova", "Blazing_Shoot" };
-            AddDefaultAttacks(BlazingDamnedOneConfig, blazingDamnedStandardAttacks);
+            HelDemonConfig.Attacks = new List<CustomAttack>();
+            var blazingDamnedStandardAttacks = new List<string> { "BlazingMace", "BlazingMace2", "BlazingMace3", "BlazingMace4", "Blazing_Nova", "Blazing_Shoot" };
+            AddDefaultAttacks(HelDemonConfig, blazingDamnedStandardAttacks);
             var Blazing_Meteors = PrefabManager.Cache.GetPrefab<ItemDrop>("Blazing_Meteors");
-            BlazingDamnedOneConfig.Attacks.Add(new CustomAttack
+            HelDemonConfig.Attacks.Add(new CustomAttack
             {
                 AttackName = Blazing_Meteors.name,
                 AttackAnimation = Blazing_Meteors.m_itemData.m_shared.m_attack.m_attackAnimation,
@@ -2124,12 +2101,12 @@ namespace EpicValheimsAdditions
                 AiAttackInterval = Blazing_Meteors.m_itemData.m_shared.m_aiAttackInterval
             });
             var projectile_meteor_blazing = PrefabManager.Cache.GetPrefab<Projectile>("projectile_meteor_blazing");
-            BlazingDamnedOneConfig.Attacks.Add(new CustomAttack
+            HelDemonConfig.Attacks.Add(new CustomAttack
             {
                 AttackName = projectile_meteor_blazing.name,
                 Damages = projectile_meteor_blazing.m_damage
             });
-            bossConfigs.Add(BlazingDamnedOneConfig);
+            bossConfigs.Add(HelDemonConfig);
 
             // Golden_Greydwarf_Miniboss
             var GoldenGreydwarfConfig = new BossConfig();
