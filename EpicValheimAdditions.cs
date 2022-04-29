@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.7.8";
+        private const string ModVersion = "1.7.9";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -34,12 +34,12 @@ namespace EpicValheimsAdditions
                 __instance.m_prefabs.Find(p => p.name == "HugeRoot1").GetComponent<Destructible>().enabled = true;
             }
         }
+
         [HarmonyPatch(typeof(OfferingBowl), "Awake")]
         public static class AlterOfferBowlAwake
         {
             public static void Prefix(OfferingBowl __instance)
             {
-               
                 if (__instance == null) return;
                 var FuelEffects = new EffectList.EffectData[2]
                     {
@@ -163,7 +163,6 @@ namespace EpicValheimsAdditions
 
         private void AddLocations()
         {
-
             GameObject MistlandsBossAltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("SvartalfrQueenAltar_New"));
             ZoneManager.Instance.AddCustomLocation(new CustomLocation(MistlandsBossAltar, true, new LocationConfig
             {
@@ -340,6 +339,7 @@ namespace EpicValheimsAdditions
 
             Jotunn.Logger.LogInfo("Updated EVA Resource drop tables");
         }
+
         private void CreateCraftingPieces()
         {
             GameObject gameObject = assetBundle.LoadAsset<GameObject>("piece_alchemystation");
@@ -521,10 +521,6 @@ namespace EpicValheimsAdditions
             });
             ItemManager.Instance.AddItem(customItem2);
 
-
-            
-
-
             GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("Heavyscale");
             ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
             component4.m_itemData.m_dropPrefab = gameObject4;
@@ -546,7 +542,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem4);
-            ///
+
             GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("Drakescale");
             ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
             component6.m_itemData.m_dropPrefab = gameObject6;
@@ -568,7 +564,7 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem6);
-            ///
+
             GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("Forgedscale");
             ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
             component8.m_itemData.m_dropPrefab = gameObject8;
@@ -590,9 +586,6 @@ namespace EpicValheimsAdditions
                     }
             });
             ItemManager.Instance.AddItem(customItem8);
-            ///
-
-
 
             GameObject oreheavymetal = assetBundle.LoadAsset<GameObject>("OreHeavymetal");
             CustomItem oreheavymetal1 = new CustomItem(oreheavymetal, true);
@@ -1761,7 +1754,7 @@ namespace EpicValheimsAdditions
             ItemManager.Instance.AddItem(customItem2);
 
             GameObject gameObject3 = assetBundle.LoadAsset<GameObject>("GreatSwordDeepAbyss");
-            CustomItem customItem3= new CustomItem(gameObject3, true, new ItemConfig
+            CustomItem customItem3 = new CustomItem(gameObject3, true, new ItemConfig
             {
                 Amount = 1,
                 CraftingStation = "piece_thorsforge",
@@ -2086,7 +2079,7 @@ namespace EpicValheimsAdditions
             var HelDemonConfig = new BossConfig();
             var HelDemon = PrefabManager.Cache.GetPrefab<Humanoid>("HelDemon");
             HelDemonConfig.BossPrefabName = "HelDemon";
-            HelDemonConfig.Health = 30000; 
+            HelDemonConfig.Health = 30000;
 
             HelDemonConfig.Attacks = new List<CustomAttack>();
             var blazingDamnedStandardAttacks = new List<string> { "BlazingMace", "BlazingMace2", "BlazingMace3", "BlazingMace4", "Blazing_Nova", "Blazing_Shoot" };
@@ -2234,7 +2227,7 @@ namespace EpicValheimsAdditions
         public int Health { get; set; }
         public List<CustomAttack> Attacks { get; set; }
     }
-    
+
     [Serializable]
     public class CustomAttack
     {
