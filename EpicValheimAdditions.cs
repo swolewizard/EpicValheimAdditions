@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.7.9";
+        private const string ModVersion = "1.8.0";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -168,85 +168,85 @@ namespace EpicValheimsAdditions
             {
                 Biome = Heightmap.Biome.Mistlands,
                 MaxAltitude = 1000f,
-                MinDistanceFromSimilar = 2000f,
+                MinDistanceFromSimilar = 4000f,
                 Unique = false,
                 Quantity = 3,
                 Priotized = true,
-                ExteriorRadius = 12f,
+                ExteriorRadius = 15f,
                 RandomRotation = false,
                 MinAltitude = 1f,
                 ClearArea = true
-            })); ; ; ;
+            }));
             GameObject DeepNorthBossAltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("JotunnAltar"));
             ZoneManager.Instance.AddCustomLocation(new CustomLocation(DeepNorthBossAltar, true, new LocationConfig
             {
                 Biome = Heightmap.Biome.DeepNorth,
                 MaxAltitude = 1000f,
-                MinDistanceFromSimilar = 2000f,
+                MinDistanceFromSimilar = 4000f,
                 Unique = false,
                 Quantity = 3,
                 Priotized = true,
-                ExteriorRadius = 12f,
+                ExteriorRadius = 20f,
                 RandomRotation = false,
                 MinAltitude = 1f,
                 ClearArea = true
-            })); ; ; ;
+            }));
             GameObject AshlandsBossAltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("BlazingDamnedOneAltar"));
             ZoneManager.Instance.AddCustomLocation(new CustomLocation(AshlandsBossAltar, true, new LocationConfig
             {
                 Biome = Heightmap.Biome.AshLands,
                 MaxAltitude = 1000f,
-                MinDistanceFromSimilar = 2000f,
+                MinDistanceFromSimilar = 4000f,
                 Unique = false,
                 Quantity = 3,
                 Priotized = true,
-                ExteriorRadius = 12f,
+                ExteriorRadius = 15f,
                 RandomRotation = false,
                 MinAltitude = 1f,
                 ClearArea = true
-            })); ; ; ;
+            }));
             GameObject MistlandsBossRuneStone = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("Vegvisir_SvartalfrQueen"));
             ZoneManager.Instance.AddCustomLocation(new CustomLocation(MistlandsBossRuneStone, true, new LocationConfig
             {
-                Biome = Heightmap.Biome.Plains,
+                Biome = Heightmap.Biome.Mistlands,
                 MaxAltitude = 1000f,
-                MinDistanceFromSimilar = 350f,
+                MinDistanceFromSimilar = 1000f,
                 Unique = false,
-                Quantity = 75,
+                Quantity = 35,
                 Priotized = true,
                 ExteriorRadius = 12f,
                 RandomRotation = false,
                 MinAltitude = 1f,
                 ClearArea = true
-            })); ; ; ;
+            }));
             GameObject DeepNorthBossRuneStone = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("Vegvisir_Jotunn"));
             ZoneManager.Instance.AddCustomLocation(new CustomLocation(DeepNorthBossRuneStone, true, new LocationConfig
             {
-                Biome = Heightmap.Biome.Mistlands,
+                Biome = Heightmap.Biome.DeepNorth,
                 MaxAltitude = 1000f,
-                MinDistanceFromSimilar = 350f,
+                MinDistanceFromSimilar = 1000f,
                 Unique = false,
-                Quantity = 75,
+                Quantity = 15,
                 Priotized = true,
-                ExteriorRadius = 12f,
+                ExteriorRadius = 6f,
                 RandomRotation = false,
                 MinAltitude = 1f,
                 ClearArea = true
-            })); ; ; ;
+            }));
             GameObject AshlandsBossRuneStone = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("Vegvisir_BlazingDamnedOne"));
             ZoneManager.Instance.AddCustomLocation(new CustomLocation(AshlandsBossRuneStone, true, new LocationConfig
             {
-                Biome = Heightmap.Biome.DeepNorth,
+                Biome = Heightmap.Biome.AshLands,
                 MaxAltitude = 1000f,
-                MinDistanceFromSimilar = 350f,
+                MinDistanceFromSimilar = 1000f,
                 Unique = false,
-                Quantity = 75,
+                Quantity = 15,
                 Priotized = true,
-                ExteriorRadius = 12f,
+                ExteriorRadius = 4f,
                 RandomRotation = false,
                 MinAltitude = 1f,
                 ClearArea = true
-            })); ; ; ;
+            }));
 
 
 
@@ -2017,11 +2017,10 @@ namespace EpicValheimsAdditions
             var bossConfigs = new List<BossConfig>();
 
             // SvartalfarQueen
-            // (int)SvartalfarQueenPrefab.m_health
             var SvartalfarQueenConfig = new BossConfig();
             var SvartalfarQueenPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("SvartalfarQueen");
             SvartalfarQueenConfig.BossPrefabName = "SvartalfarQueen";
-            SvartalfarQueenConfig.Health = 15000;
+            SvartalfarQueenConfig.Health = (int)SvartalfarQueenPrefab.m_health;
 
             SvartalfarQueenConfig.Attacks = new List<CustomAttack>();
             var SvartalfarQueenStandardAttacks = new List<string> { "SvartalfarQueenGreatSword", "SvartalfarQueenBow" };
@@ -2063,11 +2062,10 @@ namespace EpicValheimsAdditions
             bossConfigs.Add(SvartalfarQueenConfig);
 
             // Jotunn
-            // (int)JotunnPrefab.m_health
             var JotunnConfig = new BossConfig();
             var JotunnPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Jotunn");
             JotunnConfig.BossPrefabName = "Jotunn";
-            JotunnConfig.Health = 22500;
+            JotunnConfig.Health = (int)JotunnPrefab.m_health;
 
             JotunnConfig.Attacks = new List<CustomAttack>();
             var jotunnStandardAttacks = new List<string> { "Jotunn_Groundslam", "Jotunn_Groundslam2", "Jotunn_Shoot" };
@@ -2075,11 +2073,10 @@ namespace EpicValheimsAdditions
             bossConfigs.Add(JotunnConfig);
 
             // HelDemon
-            // (int)HelDemon.m_health
             var HelDemonConfig = new BossConfig();
             var HelDemon = PrefabManager.Cache.GetPrefab<Humanoid>("HelDemon");
             HelDemonConfig.BossPrefabName = "HelDemon";
-            HelDemonConfig.Health = 30000;
+            HelDemonConfig.Health = (int)HelDemon.m_health;
 
             HelDemonConfig.Attacks = new List<CustomAttack>();
             var blazingDamnedStandardAttacks = new List<string> { "BlazingMace", "BlazingMace2", "BlazingMace3", "BlazingMace4", "Blazing_Nova", "Blazing_Shoot" };
