@@ -1,5 +1,10 @@
 ![](https://i.imgur.com/4XooUJw.png)
 
+# Showcase Video:
+
+[![Watch the video](https://i.imgur.com/7DThmVC.png)](https://youtu.be/Xk5-0zWnhCg)
+
+
 # Epic Valheim Additions
  My Valheim mod from here: [https://www.nexusmods.com/valheim/mods/1475](https://www.nexusmods.com/valheim/mods/1475)
  
