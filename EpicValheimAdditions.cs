@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.9.0";
+        private const string ModVersion = "1.9.1";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -366,6 +366,12 @@ namespace EpicValheimsAdditions
             {
                 try
                 {
+                    if((config.Mistlands == false) && (config.MistlandsLocations == false))
+                    {
+                        ItemDrop prefabpick = PrefabManager.Cache.GetPrefab<ItemDrop>("PickaxeBlackMetal");
+                        prefabpick.m_itemData.m_shared.m_toolTier = 5;
+                    }
+
                     if (config.DeepNorth == true)
                     {
                         MineRock5 prefab2b = PrefabManager.Cache.GetPrefab<MineRock5>("ice_rock1_frac");
@@ -777,7 +783,7 @@ namespace EpicValheimsAdditions
                 {
                     if (config.Mistlands == true)
                     {
-                        
+
 
                         CustomItemConversion OreHeavymetal = new CustomItemConversion(new SmelterConversionConfig
                         {
@@ -1210,7 +1216,7 @@ namespace EpicValheimsAdditions
                 {
                     if (config.DeepNorth == true)
                     {
-                        
+
 
                         CustomItemConversion OreFrometal = new CustomItemConversion(new SmelterConversionConfig
                         {
@@ -2018,6 +2024,10 @@ namespace EpicValheimsAdditions
                         CustomPrefab Vegvisir_BlazingDamnedOne1 = new CustomPrefab(Vegvisir_BlazingDamnedOne, true);
                         PrefabManager.Instance.AddPrefab(Vegvisir_BlazingDamnedOne1);
 
+                        GameObject burningfragment = assetBundle.LoadAsset<GameObject>("BurningWorldTreeFragment");
+                        CustomItem burningfragment1 = new CustomItem(burningfragment, true);
+                        ItemManager.Instance.AddItem(burningfragment1);
+
                         GameObject fenrirsheart = assetBundle.LoadAsset<GameObject>("FenrirsHeart");
                         CustomItem FenrirsHeart = new CustomItem(fenrirsheart, true, new ItemConfig
                         {
@@ -2036,9 +2046,7 @@ namespace EpicValheimsAdditions
                         });
                         ItemManager.Instance.AddItem(FenrirsHeart);
 
-                        GameObject burningfragment = assetBundle.LoadAsset<GameObject>("BurningWorldTreeFragment");
-                        CustomItem burningfragment1 = new CustomItem(burningfragment, true);
-                        ItemManager.Instance.AddItem(burningfragment1);
+                        
 
                         Jotunn.Logger.LogInfo("Loaded EVA Ashlands content");
                     }
@@ -2218,6 +2226,7 @@ namespace EpicValheimsAdditions
             var evaconfig = new List<EVAConfiguration>();
 
             var contentconfig = new EVAConfiguration();
+            contentconfig.Description = "Locations contain (Altars/Bosses/Vegvisirs/Ores/Trees), Mistlands/Deepnorth/Ashlands contain (Weapons/Tools/Resources/Crafting tables/Boss summons). Having just the locations toggled true, wouldn't work progression wise.";
             contentconfig.MistlandsLocations = false;
             contentconfig.Mistlands = false;
             contentconfig.DeepNorthLocations = true;
@@ -2348,6 +2357,7 @@ namespace EpicValheimsAdditions
     [Serializable]
     public class EVAConfiguration
     {
+        public string Description { get; set; }
         public bool MistlandsLocations { get; set; }
         public bool Mistlands { get; set; }
         public bool DeepNorthLocations { get; set; }
