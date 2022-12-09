@@ -366,7 +366,7 @@ namespace EpicValheimsAdditions
             {
                 try
                 {
-                    if((config.Mistlands == false) && (config.MistlandsLocations == false))
+                    if(config.MistlandsLocations == false)
                     {
                         ItemDrop prefabpick = PrefabManager.Cache.GetPrefab<ItemDrop>("PickaxeBlackMetal");
                         prefabpick.m_itemData.m_shared.m_toolTier = 5;
