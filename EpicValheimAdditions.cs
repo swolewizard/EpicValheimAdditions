@@ -176,8 +176,8 @@ namespace EpicValheimsAdditions
                 }
             }
 
-            GameObject GoldenGreydwarfalter = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaGreydwarf"));
-            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenGreydwarfalter, true, new LocationConfig
+            GameObject GoldenGreydwarfaltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaGreydwarf"));
+            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenGreydwarfaltar, true, new LocationConfig
             {
                 Biome = Heightmap.Biome.Meadows,
                 MaxAltitude = 1000f,
@@ -191,8 +191,8 @@ namespace EpicValheimsAdditions
                 ClearArea = true
             }));
 
-            GameObject GoldenTrollalter = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaTroll"));
-            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenTrollalter, true, new LocationConfig
+            GameObject GoldenTrollaltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaTroll"));
+            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenTrollaltar, true, new LocationConfig
             {
                 Biome = Heightmap.Biome.BlackForest,
                 MaxAltitude = 8500f,
@@ -206,10 +206,10 @@ namespace EpicValheimsAdditions
                 ClearArea = true
             }));
 
-            GameObject GoldenWraithalter = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaWraith"));
-            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenWraithalter, true, new LocationConfig
+            GameObject GoldenWraithaltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaWraith"));
+            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenWraithaltar, true, new LocationConfig
             {
-                Biome = Heightmap.Biome.Meadows,
+                Biome = Heightmap.Biome.Swamp,
                 MaxAltitude = 8500f,
                 MinDistanceFromSimilar = 150f,
                 Unique = false,
