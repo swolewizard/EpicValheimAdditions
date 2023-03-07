@@ -18,111 +18,13 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.9.1";
+        private const string ModVersion = "1.9.3";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
         public static string configPath2 = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}_Content.json");
         private AssetBundle assetBundle;
         private Harmony _harmony;
-
-
-        [HarmonyPatch(typeof(OfferingBowl), "Awake")]
-        public static class AlterOfferBowlAwake
-        {
-            public static void Prefix(OfferingBowl __instance)
-            {
-                if (__instance == null) return;
-                var FuelEffects = new EffectList.EffectData[2]
-                    {
-                        new EffectList.EffectData
-                        {
-                            m_prefab = ZNetScene.instance.GetPrefab("sfx_offering"),
-                            m_enabled = true,
-                            m_variant = -1,
-                        },
-                        new EffectList.EffectData
-                        {
-                            m_prefab = ZNetScene.instance.GetPrefab("vfx_offering"),
-                            m_enabled = true,
-                            m_variant = -1,
-                        }
-                    };
-                var SpawnStart = new EffectList.EffectData[2]
-                    {
-                        new EffectList.EffectData
-                        {
-                            m_prefab = ZNetScene.instance.GetPrefab("sfx_prespawn"),
-                            m_enabled = true,
-                            m_variant = -1,
-                        },
-                        new EffectList.EffectData
-                        {
-                            m_prefab = ZNetScene.instance.GetPrefab("vfx_prespawn"),
-                            m_enabled = true,
-                            m_variant = -1,
-                        }
-                    };
-                var SpawnDone = new EffectList.EffectData[2]
-                    {
-                        new EffectList.EffectData
-                        {
-                            m_prefab = ZNetScene.instance.GetPrefab("sfx_spawn"),
-                            m_enabled = true,
-                            m_variant = -1,
-                        },
-                        new EffectList.EffectData
-                        {
-                            m_prefab = ZNetScene.instance.GetPrefab("vfx_spawn"),
-                            m_enabled = true,
-                            m_variant = -1,
-                        }
-                    };
-                if (GameObject.Find("StaminaGreydwarf(Clone)") != null)
-                {
-                    GameObject prefabgreydwarf = GameObject.Find("StaminaGreydwarf(Clone)").gameObject;
-                    OfferingBowl componentInChildren4 = prefabgreydwarf.GetComponentInChildren<OfferingBowl>();
-                    componentInChildren4.m_name = "Golden Greydwarf Miniboss";
-                    componentInChildren4.m_bossPrefab = ZNetScene.instance.GetPrefab("Golden_Greydwarf_Miniboss").gameObject;
-                    componentInChildren4.m_spawnBossDelay = 12;
-                    componentInChildren4.m_spawnBossMaxDistance = 10;
-                    componentInChildren4.m_spawnBossMaxYDistance = 9999;
-                    componentInChildren4.m_spawnOffset = 0;
-                    componentInChildren4.m_fuelAddedEffects.m_effectPrefabs = FuelEffects;
-                    componentInChildren4.m_spawnBossStartEffects.m_effectPrefabs = SpawnStart;
-                    componentInChildren4.m_spawnBossDoneffects.m_effectPrefabs = SpawnDone;
-                }
-                if (GameObject.Find("StaminaTroll(Clone)") != null)
-                {
-                    GameObject prefabTroll = GameObject.Find("StaminaTroll(Clone)").gameObject;
-                    OfferingBowl componentInChildren5 = prefabTroll.GetComponentInChildren<OfferingBowl>();
-                    componentInChildren5.m_name = "Golden Troll Miniboss";
-                    componentInChildren5.m_bossPrefab = ZNetScene.instance.GetPrefab("Golden_Troll_Miniboss").gameObject;
-                    componentInChildren5.m_spawnBossDelay = 12;
-                    componentInChildren5.m_spawnBossMaxDistance = 10;
-                    componentInChildren5.m_spawnBossMaxYDistance = 9999;
-                    componentInChildren5.m_spawnOffset = 0;
-                    componentInChildren5.m_fuelAddedEffects.m_effectPrefabs = FuelEffects;
-                    componentInChildren5.m_spawnBossStartEffects.m_effectPrefabs = SpawnStart;
-                    componentInChildren5.m_spawnBossDoneffects.m_effectPrefabs = SpawnDone;
-                }
-                if (GameObject.Find("StaminaWraith(Clone)") != null)
-                {
-                    GameObject prefabwraith = GameObject.Find("StaminaWraith(Clone)").gameObject;
-                    OfferingBowl componentInChildren6 = prefabwraith.GetComponentInChildren<OfferingBowl>();
-                    componentInChildren6.m_name = "Golden Wraith Miniboss";
-                    componentInChildren6.m_bossPrefab = ZNetScene.instance.GetPrefab("Golden_Wraith_Miniboss").gameObject;
-                    componentInChildren6.m_spawnBossDelay = 12;
-                    componentInChildren6.m_spawnBossMaxDistance = 10;
-                    componentInChildren6.m_spawnBossMaxYDistance = 9999;
-                    componentInChildren6.m_spawnOffset = 0;
-                    componentInChildren6.m_fuelAddedEffects.m_effectPrefabs = FuelEffects;
-                    componentInChildren6.m_spawnBossStartEffects.m_effectPrefabs = SpawnStart;
-                    componentInChildren6.m_spawnBossDoneffects.m_effectPrefabs = SpawnDone;
-                }
-            }
-        }
-
 
         private void Awake()
         {
@@ -273,6 +175,52 @@ namespace EpicValheimsAdditions
                     Jotunn.Logger.LogError($"Loading config for {config.MistlandsLocations},{config.DeepNorthLocations},{config.AshlandsLocations} failed. {e.Message} {e.StackTrace}");
                 }
             }
+
+            GameObject GoldenGreydwarfalter = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaGreydwarf"));
+            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenGreydwarfalter, true, new LocationConfig
+            {
+                Biome = Heightmap.Biome.Meadows,
+                MaxAltitude = 1000f,
+                MinDistanceFromSimilar = 150f,
+                Unique = false,
+                Quantity = 15,
+                Priotized = true,
+                ExteriorRadius = 4f,
+                RandomRotation = false,
+                MinAltitude = 1f,
+                ClearArea = true
+            }));
+
+            GameObject GoldenTrollalter = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaTroll"));
+            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenTrollalter, true, new LocationConfig
+            {
+                Biome = Heightmap.Biome.BlackForest,
+                MaxAltitude = 8500f,
+                MinDistanceFromSimilar = 150f,
+                Unique = false,
+                Quantity = 15,
+                Priotized = true,
+                ExteriorRadius = 4f,
+                RandomRotation = false,
+                MinAltitude = 1f,
+                ClearArea = true
+            }));
+
+            GameObject GoldenWraithalter = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaWraith"));
+            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenWraithalter, true, new LocationConfig
+            {
+                Biome = Heightmap.Biome.Meadows,
+                MaxAltitude = 8500f,
+                MinDistanceFromSimilar = 150f,
+                Unique = false,
+                Quantity = 15,
+                Priotized = true,
+                ExteriorRadius = 4f,
+                RandomRotation = false,
+                MinAltitude = 1f,
+                ClearArea = true
+            }));
+
 
             Jotunn.Logger.LogInfo("Loaded Locations");
 
@@ -797,6 +745,10 @@ namespace EpicValheimsAdditions
                         ItemDrop component = gameObject.GetComponent<ItemDrop>();
                         component.m_itemData.m_shared.m_maxDurability = 200;
                         component.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        component.m_itemData.m_shared.m_attack.m_bowDraw = true;
+                        component.m_itemData.m_shared.m_attack.m_drawAnimationState = "bow_aim";
+                        component.m_itemData.m_shared.m_attack.m_drawDurationMin = 2.3f;
+                        component.m_itemData.m_shared.m_attack.m_drawStaminaDrain = 9;
                         CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
                         {
                             Amount = 1,
@@ -1230,6 +1182,10 @@ namespace EpicValheimsAdditions
                         ItemDrop component = gameObject.GetComponent<ItemDrop>();
                         component.m_itemData.m_shared.m_maxDurability = 250;
                         component.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        component.m_itemData.m_shared.m_attack.m_bowDraw = true;
+                        component.m_itemData.m_shared.m_attack.m_drawAnimationState = "bow_aim";
+                        component.m_itemData.m_shared.m_attack.m_drawDurationMin = 2.1f;
+                        component.m_itemData.m_shared.m_attack.m_drawStaminaDrain = 8;
                         CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
                         {
                             Amount = 1,
@@ -1686,6 +1642,10 @@ namespace EpicValheimsAdditions
                         ItemDrop component = gameObject.GetComponent<ItemDrop>();
                         component.m_itemData.m_shared.m_maxDurability = 300;
                         component.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        component.m_itemData.m_shared.m_attack.m_bowDraw = true;
+                        component.m_itemData.m_shared.m_attack.m_drawAnimationState = "bow_aim";
+                        component.m_itemData.m_shared.m_attack.m_drawDurationMin = 1.9f;
+                        component.m_itemData.m_shared.m_attack.m_drawStaminaDrain = 7;
                         CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
                         {
                             Amount = 1,
