@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.9.3";
+        private const string ModVersion = "1.9.5";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -239,14 +239,16 @@ namespace EpicValheimsAdditions
                         GameObject HeavymetalVein = assetBundle.LoadAsset<GameObject>("HeavymetalVein");
                         CustomVegetation customVegetation = new CustomVegetation(HeavymetalVein, true, new VegetationConfig
                         {
-                            Max = 2f,
+                            Max = 3f,
+                            Min = 1f,
                             GroupSizeMin = 1,
                             GroupSizeMax = 2,
-                            GroupRadius = 15f,
-                            BlockCheck = true,
+                            GroupRadius = 12f,
+                            BlockCheck = false,
                             Biome = Heightmap.Biome.Mistlands,
-                            MinAltitude = 5f,
-                            MaxTilt = 20f
+                            MinAltitude = 0f,
+                            MaxAltitude = 1000f,
+                            MaxTilt = 50f
                         });
                         ZoneManager.Instance.AddCustomVegetation(customVegetation);
                     }
@@ -327,9 +329,9 @@ namespace EpicValheimsAdditions
                         var IceRockDrop = new List<DropTable.DropData> {
                         new DropTable.DropData {
                             m_item = item2,
-                            m_stackMax = 1,
+                            m_stackMax = 2,
                             m_stackMin = 1,
-                            m_weight = 1
+                            m_weight = 2
                         }
                     };
                         prefab2b.m_dropItems.m_drops = IceRockDrop;
@@ -340,7 +342,7 @@ namespace EpicValheimsAdditions
                         prefab2b.m_minToolTier = 5;
                         prefab2b.m_dropItems.m_dropMin = 1;
                         prefab2b.m_dropItems.m_dropMax = 2;
-                        prefab2b.m_dropItems.m_dropChance = 0.05f;
+                        prefab2b.m_dropItems.m_dropChance = 0.35f;
                     }
                 }
                 catch (Exception e)
@@ -745,10 +747,6 @@ namespace EpicValheimsAdditions
                         ItemDrop component = gameObject.GetComponent<ItemDrop>();
                         component.m_itemData.m_shared.m_maxDurability = 200;
                         component.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        component.m_itemData.m_shared.m_attack.m_bowDraw = true;
-                        component.m_itemData.m_shared.m_attack.m_drawAnimationState = "bow_aim";
-                        component.m_itemData.m_shared.m_attack.m_drawDurationMin = 2.3f;
-                        component.m_itemData.m_shared.m_attack.m_drawStaminaDrain = 9;
                         CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
                         {
                             Amount = 1,
@@ -1114,6 +1112,7 @@ namespace EpicValheimsAdditions
                         CustomPrefab Vegvisir_SvartalfrQueen1 = new CustomPrefab(Vegvisir_SvartalfrQueen, true);
                         PrefabManager.Instance.AddPrefab(Vegvisir_SvartalfrQueen1);
 
+
                         GameObject cursedEffigy = assetBundle.LoadAsset<GameObject>("CursedEffigy");
                         CustomItem CursedEffigy = new CustomItem(cursedEffigy, true, new ItemConfig
                         {
@@ -1182,10 +1181,6 @@ namespace EpicValheimsAdditions
                         ItemDrop component = gameObject.GetComponent<ItemDrop>();
                         component.m_itemData.m_shared.m_maxDurability = 250;
                         component.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        component.m_itemData.m_shared.m_attack.m_bowDraw = true;
-                        component.m_itemData.m_shared.m_attack.m_drawAnimationState = "bow_aim";
-                        component.m_itemData.m_shared.m_attack.m_drawDurationMin = 2.1f;
-                        component.m_itemData.m_shared.m_attack.m_drawStaminaDrain = 8;
                         CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
                         {
                             Amount = 1,
@@ -1198,8 +1193,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 2
+                                Amount = 8,
+                                AmountPerLevel = 4
                         },
                         new RequirementConfig {
                             Item = "LoxPelt",
@@ -1230,8 +1225,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 2
+                                Amount = 8,
+                                AmountPerLevel = 4
                         },
                         new RequirementConfig {
                             Item = "LoxPelt",
@@ -1262,8 +1257,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 7,
-                                AmountPerLevel = 3
+                                Amount = 13,
+                                AmountPerLevel = 5
                         },
                         new RequirementConfig {
                             Item = "LoxPelt",
@@ -1294,8 +1289,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 2
+                                Amount = 8,
+                                AmountPerLevel = 4
                         },
                         new RequirementConfig {
                             Item = "LoxPelt",
@@ -1326,8 +1321,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 2
+                                Amount = 8,
+                                AmountPerLevel = 4
                         },
                         new RequirementConfig {
                             Item = "YggdrasilWood",
@@ -1353,8 +1348,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 2,
-                                AmountPerLevel = 1
+                                Amount = 5,
+                                AmountPerLevel = 2
                         },
                         new RequirementConfig {
                             Item = "YggdrasilWood",
@@ -1380,8 +1375,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 2
+                                Amount = 8,
+                                AmountPerLevel = 4
                         },
                         new RequirementConfig {
                             Item = "LoxPelt",
@@ -1412,8 +1407,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 10,
-                                AmountPerLevel = 5
+                                Amount = 15,
+                                AmountPerLevel = 8
                         },
                         new RequirementConfig {
                             Item = "YggdrasilWood",
@@ -1439,8 +1434,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 2
+                                Amount = 8,
+                                AmountPerLevel = 4
                         },
                         new RequirementConfig {
                             Item = "LoxPelt",
@@ -1472,8 +1467,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 2
+                                Amount = 8,
+                                AmountPerLevel = 4
                         },
                         new RequirementConfig {
                             Item = "YggdrasilWood",
@@ -1486,7 +1481,6 @@ namespace EpicValheimsAdditions
                         GameObject gameObject11 = assetBundle.LoadAsset<GameObject>("ShieldFrometalTower");
                         ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
                         component11.m_itemData.m_shared.m_name = "Frometal Tower Shield";
-                        component11.m_itemData.m_shared.m_description = "A Towershield made out of Frometal.";
                         component11.m_itemData.m_shared.m_variants = 0;
                         component11.m_itemData.m_shared.m_maxDurability = 250;
                         component11.m_itemData.m_shared.m_durabilityPerLevel = 65;
@@ -1502,8 +1496,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 7,
-                                AmountPerLevel = 3
+                                Amount = 13,
+                                AmountPerLevel = 5
                         },
                         new RequirementConfig {
                             Item = "YggdrasilWood",
@@ -1530,8 +1524,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 3,
-                                AmountPerLevel = 2
+                                Amount = 5,
+                                AmountPerLevel = 3
                         },
                         new RequirementConfig {
                             Item = "YggdrasilWood",
@@ -1562,8 +1556,8 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 3,
-                                AmountPerLevel = 2
+                                Amount = 5,
+                                AmountPerLevel = 3
                         },
                         new RequirementConfig {
                             Item = "YggdrasilWood",
@@ -1598,7 +1592,7 @@ namespace EpicValheimsAdditions
                         },
                         new RequirementConfig {
                             Item = "PrimordialIce",
-                                Amount = 10
+                                Amount = 20
                         },
                         new RequirementConfig {
                             Item = "YggdrasilWood",
@@ -1642,10 +1636,6 @@ namespace EpicValheimsAdditions
                         ItemDrop component = gameObject.GetComponent<ItemDrop>();
                         component.m_itemData.m_shared.m_maxDurability = 300;
                         component.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        component.m_itemData.m_shared.m_attack.m_bowDraw = true;
-                        component.m_itemData.m_shared.m_attack.m_drawAnimationState = "bow_aim";
-                        component.m_itemData.m_shared.m_attack.m_drawDurationMin = 1.9f;
-                        component.m_itemData.m_shared.m_attack.m_drawStaminaDrain = 7;
                         CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
                         {
                             Amount = 1,
@@ -1901,7 +1891,6 @@ namespace EpicValheimsAdditions
                         GameObject gameObject11 = assetBundle.LoadAsset<GameObject>("ShieldFlametalTower");
                         ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
                         component11.m_itemData.m_shared.m_name = "Flametal Tower Shield";
-                        component11.m_itemData.m_shared.m_description = "A Towershield made out of Flametal.";
                         component11.m_itemData.m_shared.m_variants = 0;
                         component11.m_itemData.m_shared.m_maxDurability = 300;
                         component11.m_itemData.m_shared.m_durabilityPerLevel = 75;
