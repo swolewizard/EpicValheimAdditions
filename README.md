@@ -1,4 +1,4 @@
-![](https://i.imgur.com/lL5QSZc.png)
+![](https://i.imgur.com/KrD84h7.png)
 
 ![Epic Valheim Additions](https://i.imgur.com/9wBIvSa.png)
 # Showcase video updated for 2.0
