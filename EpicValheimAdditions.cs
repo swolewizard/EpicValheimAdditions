@@ -18,13 +18,14 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "1.9.5";
+        private const string ModVersion = "2.0.0";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
         public static string configPath2 = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}_Content.json");
         private AssetBundle assetBundle;
         private Harmony _harmony;
+        private List<string> sfxAssetNames = new List<string>();
 
         private void Awake()
         {
@@ -33,19 +34,20 @@ namespace EpicValheimsAdditions
             this.LoadContentConfig();
             this.CreateCraftingPieces();
             this.RegisterMiscItems();
+            this.RegisterAllPrefabs();
             this.RegisterBossStuff();
             this.RegisterMistlands();
             this.RegisterDeepnorth();
             this.RegisterAshlands();
+            this.RegisterDeepAbyss();
+            this.AddCreatures();
             this.CreateIngots_Scales();
-            this.RegisterDeepAbyssWeapons();
             this.AddVegetation();
             this.LoadConfig();
             ZoneManager.OnVanillaLocationsAvailable += AddLocations;
             ZoneManager.OnVanillaLocationsAvailable += ModDrops;
-            ZoneManager.OnVanillaLocationsAvailable += ModThorsForgeLevel;
-            ZoneManager.OnVanillaLocationsAvailable += ModAlchemyLevel;
-
+            ZoneManager.OnVanillaLocationsAvailable += ModCraftingStationLevels;
+            PrefabManager.OnVanillaPrefabsAvailable += FixSfx;
         }
 
         private void RegisterPrefabs()
@@ -54,275 +56,313 @@ namespace EpicValheimsAdditions
             assetBundle = AssetUtils.LoadAssetBundleFromResources("eva_assets", typeof(Core).Assembly);
             Jotunn.Logger.LogInfo("Loaded Prefabs");
         }
-
-        private void AddLocations()
+        public void Start()
         {
-            var contentConfigs = GetJson2();
+            UpgradeWorld.Upgrade.Register("EVA_upgrade_mistlands", "Adds Mistlands locations and vegetations of mod EVA.", "locations_add SvartalfrQueenAltar_New,Vegvisir_SvartalfrQueen", "vegetation_reset HeavymetalVein start");
+
+            UpgradeWorld.Upgrade.Register("EVA_upgrade_deepnorth", "Adds DeepNorth locations and vegetations of mod EVA.", "locations_add JotunnAltar,Vegvisir_Jotunn", "vegetation_reset FrometalVein_frac,EVA_Rock1,EVA_Rock2,EVA_Rock3," +
+                "EVA_Rock4,EVA_Rock5,EVA_Rock6,EVA_Rock7,EVA_Rock8,EVA_Rock9,EVA_Rock10,EVA_Rock11,EVA_Rock12,EVA_Rock13,EVA_Tree1,EVA_Tree2,EVA_Tree3,EVA_Bush1,EVA_Bush2,Pickable_Snowgil_Shroom start");
+
+            UpgradeWorld.Upgrade.Register("EVA_upgrade_ashlands", "Adds Ashlands locations and vegetations of mod EVA.", "locations_add BlazingDamnedOneAltar,Vegvisir_BlazingDamnedOne", "vegetation_reset EVA_SutRock1,EVA_SutRock2,EVA_SutRock3," +
+                "EVA_SutRock4,EVA_SutRock5,EVA_SutRock6,EVA_SutRock7,EVA_SutRock8,EVA_SutRock9,EVA_SutRock10,EVA_SutRock11,EVA_BurningTree1,EVA_BurningTree2,EVA_BurningTree3,EVA_BurningBush1,EVA_BurningBush2,EVA_BurningBush3,Pickable_Emberbloom start");
+
+            UpgradeWorld.Upgrade.Register("EVA_upgrade", "Adds all locations and vegetations of mod EVA.", "locations_add SvartalfrQueenAltar_New,Vegvisir_SvartalfrQueen,JotunnAltar,Vegvisir_Jotunn,BlazingDamnedOneAltar,Vegvisir_BlazingDamnedOne start",
+                "vegetation_reset HeavymetalVein,FrometalVein_frac,EVA_Rock1,EVA_Rock2,EVA_Rock3,EVA_Rock4,EVA_Rock5,EVA_Rock6,EVA_Rock7,EVA_Rock8,EVA_Rock9,EVA_Rock10,EVA_Rock11,EVA_Rock12,EVA_Rock13,EVA_Tree1,EVA_Tree2,EVA_Tree3,EVA_Bush1," +
+                "EVA_Bush2,Pickable_Snowgil_Shroom,EVA_SutRock1,EVA_SutRock2,EVA_SutRock3,EVA_SutRock4,EVA_SutRock5,EVA_SutRock6,EVA_SutRock7,EVA_SutRock8,EVA_SutRock9,EVA_SutRock10,EVA_SutRock11,EVA_BurningTree1,EVA_BurningTree2," +
+                "EVA_BurningTree3,EVA_BurningBush1,EVA_BurningBush2,EVA_BurningBush3,Pickable_Emberbloom start");
+        }
+
+        private void AddCreatures()
+        {
+            var contentConfigs = GetJson<EVAConfiguration>(configPath2);
 
             foreach (var config in contentConfigs)
             {
                 try
                 {
-                    if (config.MistlandsLocations == true)
+                    if (config.Creatures.DeepNorthCreatures)
                     {
-                        GameObject MistlandsBossAltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("SvartalfrQueenAltar_New"));
-                        ZoneManager.Instance.AddCustomLocation(new CustomLocation(MistlandsBossAltar, true, new LocationConfig
-                        {
-                            Biome = Heightmap.Biome.Mistlands,
-                            MaxAltitude = 1000f,
-                            MinDistanceFromSimilar = 4000f,
-                            Unique = false,
-                            Quantity = 3,
-                            Priotized = true,
-                            ExteriorRadius = 15f,
-                            RandomRotation = false,
-                            MinAltitude = 1f,
-                            ClearArea = true
-                        }));
-                        GameObject MistlandsBossRuneStone = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("Vegvisir_SvartalfrQueen"));
-                        ZoneManager.Instance.AddCustomLocation(new CustomLocation(MistlandsBossRuneStone, true, new LocationConfig
-                        {
-                            Biome = Heightmap.Biome.Mistlands,
-                            MaxAltitude = 1000f,
-                            MinDistanceFromSimilar = 1000f,
-                            Unique = false,
-                            Quantity = 35,
-                            Priotized = true,
-                            ExteriorRadius = 12f,
-                            RandomRotation = false,
-                            MinAltitude = 1f,
-                            ClearArea = true
-                        }));
+                        CreateCreatures("CrystalhideUrsar", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, 15f, 3, "Crystalhide Ursar");
+                        CreateCreatures("CrystalhideUrsar_Cub", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, 5f, 1, "Crystalhide Ursar Cub");
+                        CreateCreatures("FrostwingFae", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, 15f, 4, "Frostwing Fae");
+                    }
+                    else
+                    {
+                        LoadAndRegisterAsset("CrystalhideUrsar", CustomAssetType.Prefab);
+                        LoadAndRegisterAsset("CrystalhideUrsar_Cub", CustomAssetType.Prefab);
+                        LoadAndRegisterAsset("FrostwingFae", CustomAssetType.Prefab);
+                        Jotunn.Logger.LogInfo("EVA Deep North creatures are turned off");
+                    }
+                    if (config.Creatures.AshlandsCreatures)
+                    {
+                        CreateCreatures("MagmaSkarab", Character.Faction.Demon, Heightmap.Biome.AshLands, 15f, 4, "Magma Skarab");
+                        CreateCreatures("InfernalMinotaur", Character.Faction.Demon, Heightmap.Biome.AshLands, 15f, 3, "Infernal Minotaur");
+                    }
+                    else
+                    {
+                        LoadAndRegisterAsset("MagmaSkarab", CustomAssetType.Prefab);
+                        LoadAndRegisterAsset("InfernalMinotaur", CustomAssetType.Prefab);
+                        Jotunn.Logger.LogInfo("EVA Ashlands creatures are turned off");
+                    }
+                    if (config.Creatures.OceanCreatures)
+                    {
+                        CreateCreatures("DraugrMariner", Character.Faction.SeaMonsters, Heightmap.Biome.Ocean, 15f, 3, "Draugr Mariner", "Killed_HelDemon");
+                    }
+                    else
+                    {
+                        LoadAndRegisterAsset("DraugrMariner", CustomAssetType.Prefab);
+                        Jotunn.Logger.LogInfo("EVA Ocean creatures are turned off");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Jotunn.Logger.LogError($"Loading config for Deep North:{config.Creatures.DeepNorthCreatures}, Ashlands:{config.Creatures.AshlandsCreatures}, Ocean:{config.Creatures.OceanCreatures} failed. {e.Message} {e.StackTrace}");
+                }
+            }
+            Jotunn.Logger.LogInfo("Loaded Creatures");
+        }
+
+        private void CreateCreatures(string creaturePrefabName, Character.Faction faction, Heightmap.Biome biome, float spawnChance, int maxSpawned, string spawnName, string key = "")
+        {
+            var customCreaturePrefab = assetBundle.LoadAsset<GameObject>(creaturePrefabName);
+
+            var customCreatureConfig = new CreatureConfig();
+            customCreatureConfig.Name = spawnName;
+            customCreatureConfig.Faction = faction;
+
+            if(creaturePrefabName == "DraugrMariner")
+            {
+                customCreatureConfig.AddSpawnConfig(new SpawnConfig
+                {
+                    Name = spawnName,
+                    SpawnChance = spawnChance,
+                    MaxSpawned = maxSpawned,
+                    Biome = biome,
+                    RequiredGlobalKey = key,
+                    MaxAltitude = -5,
+                    MinAltitude = -100,
+                    SpawnDistance = 50,
+                    GroupRadius = 3,
+                    MinGroupSize = 1,
+                    MaxGroupSize = 1,
+                    MinTilt = 0,
+                    MaxTilt = 35,
+                    SpawnInForest = true,
+                    SpawnOutsideForest = true,
+                    BiomeArea = Heightmap.BiomeArea.Median,
+                    SpawnInterval = 500,
+                    GroundOffset = 0.5f,
+                    SpawnAtDay = false,
+                    SpawnAtNight = true
+                });
+            }
+            else
+            {
+                customCreatureConfig.AddSpawnConfig(new SpawnConfig
+                {
+                    Name = spawnName,
+                    SpawnChance = spawnChance,
+                    MaxSpawned = maxSpawned,
+                    Biome = biome,
+                    RequiredGlobalKey = key
+                });
+            }
+            
+
+            CreatureManager.Instance.AddCreature(new CustomCreature(customCreaturePrefab, true, customCreatureConfig));
+        }
+
+        private void AddLocations()
+        {
+            var contentConfigs = GetJson<EVAConfiguration>(configPath2);
+
+            foreach (var config in contentConfigs)
+            {
+                try
+                {
+                    if (config.Locations.MistlandsLocations)
+                    {
+                        AddCustomLocation("SvartalfrQueenAltar_New", Heightmap.Biome.Mistlands, 1000f, 4000f, 3, 15f, false, 1f, true, false, true);
+                        AddCustomLocation("Vegvisir_SvartalfrQueen", Heightmap.Biome.Mistlands, 1000f, 1000f, 35, 12f, false, 1f, true, false, true);
                     }
                     else
                     {
                         Jotunn.Logger.LogInfo("EVA Mistlands locations are turned off");
                     }
-                    if (config.DeepNorthLocations == true)
+
+                    if (config.Locations.DeepNorthLocations)
                     {
-                        GameObject DeepNorthBossAltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("JotunnAltar"));
-                        ZoneManager.Instance.AddCustomLocation(new CustomLocation(DeepNorthBossAltar, true, new LocationConfig
-                        {
-                            Biome = Heightmap.Biome.DeepNorth,
-                            MaxAltitude = 1000f,
-                            MinDistanceFromSimilar = 4000f,
-                            Unique = false,
-                            Quantity = 3,
-                            Priotized = true,
-                            ExteriorRadius = 20f,
-                            RandomRotation = false,
-                            MinAltitude = 1f,
-                            ClearArea = true
-                        }));
-                        GameObject DeepNorthBossRuneStone = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("Vegvisir_Jotunn"));
-                        ZoneManager.Instance.AddCustomLocation(new CustomLocation(DeepNorthBossRuneStone, true, new LocationConfig
-                        {
-                            Biome = Heightmap.Biome.DeepNorth,
-                            MaxAltitude = 1000f,
-                            MinDistanceFromSimilar = 1000f,
-                            Unique = false,
-                            Quantity = 15,
-                            Priotized = true,
-                            ExteriorRadius = 6f,
-                            RandomRotation = false,
-                            MinAltitude = 1f,
-                            ClearArea = true
-                        }));
+                        AddCustomLocation("JotunnAltar", Heightmap.Biome.DeepNorth, 1000f, 4000f, 3, 20f, false, 1f, true, false, true);
+                        AddCustomLocation("Vegvisir_Jotunn", Heightmap.Biome.DeepNorth, 1000f, 1000f, 15, 6f, false, 1f, true, false, true);
                     }
                     else
                     {
                         Jotunn.Logger.LogInfo("EVA DeepNorth locations are turned off");
                     }
-                    if (config.AshlandsLocations == true)
+
+                    if (config.Locations.AshlandsLocations)
                     {
-                        GameObject AshlandsBossAltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("BlazingDamnedOneAltar"));
-                        ZoneManager.Instance.AddCustomLocation(new CustomLocation(AshlandsBossAltar, true, new LocationConfig
-                        {
-                            Biome = Heightmap.Biome.AshLands,
-                            MaxAltitude = 1000f,
-                            MinDistanceFromSimilar = 4000f,
-                            Unique = false,
-                            Quantity = 3,
-                            Priotized = true,
-                            ExteriorRadius = 15f,
-                            RandomRotation = false,
-                            MinAltitude = 1f,
-                            ClearArea = true
-                        }));
-                        GameObject AshlandsBossRuneStone = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("Vegvisir_BlazingDamnedOne"));
-                        ZoneManager.Instance.AddCustomLocation(new CustomLocation(AshlandsBossRuneStone, true, new LocationConfig
-                        {
-                            Biome = Heightmap.Biome.AshLands,
-                            MaxAltitude = 1000f,
-                            MinDistanceFromSimilar = 1000f,
-                            Unique = false,
-                            Quantity = 15,
-                            Priotized = true,
-                            ExteriorRadius = 4f,
-                            RandomRotation = false,
-                            MinAltitude = 1f,
-                            ClearArea = true
-                        }));
+                        AddCustomLocation("BlazingDamnedOneAltar", Heightmap.Biome.AshLands, 1000f, 4000f, 3, 15f, false, 1f, true, false, true);
+                        AddCustomLocation("Vegvisir_BlazingDamnedOne", Heightmap.Biome.AshLands, 1000f, 1000f, 15, 4f, false, 1f, true, false, true);
                     }
                     else
                     {
                         Jotunn.Logger.LogInfo("EVA Ashlands locations are turned off");
                     }
-
                 }
                 catch (Exception e)
                 {
-                    Jotunn.Logger.LogError($"Loading config for {config.MistlandsLocations},{config.DeepNorthLocations},{config.AshlandsLocations} failed. {e.Message} {e.StackTrace}");
+                    Jotunn.Logger.LogError($"Loading config for Mistlands:{config.Locations.MistlandsLocations}, DeepNorth:{config.Locations.DeepNorthLocations}, Ashlands:{config.Locations.AshlandsLocations} failed. {e.Message} {e.StackTrace}");
                 }
             }
 
-            GameObject GoldenGreydwarfaltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaGreydwarf"));
-            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenGreydwarfaltar, true, new LocationConfig
-            {
-                Biome = Heightmap.Biome.Meadows,
-                MaxAltitude = 1000f,
-                MinDistanceFromSimilar = 150f,
-                Unique = false,
-                Quantity = 15,
-                Priotized = true,
-                ExteriorRadius = 4f,
-                RandomRotation = false,
-                MinAltitude = 1f,
-                ClearArea = true
-            }));
-
-            GameObject GoldenTrollaltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaTroll"));
-            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenTrollaltar, true, new LocationConfig
-            {
-                Biome = Heightmap.Biome.BlackForest,
-                MaxAltitude = 8500f,
-                MinDistanceFromSimilar = 150f,
-                Unique = false,
-                Quantity = 15,
-                Priotized = true,
-                ExteriorRadius = 4f,
-                RandomRotation = false,
-                MinAltitude = 1f,
-                ClearArea = true
-            }));
-
-            GameObject GoldenWraithaltar = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>("StaminaWraith"));
-            ZoneManager.Instance.AddCustomLocation(new CustomLocation(GoldenWraithaltar, true, new LocationConfig
-            {
-                Biome = Heightmap.Biome.Swamp,
-                MaxAltitude = 8500f,
-                MinDistanceFromSimilar = 150f,
-                Unique = false,
-                Quantity = 15,
-                Priotized = true,
-                ExteriorRadius = 4f,
-                RandomRotation = false,
-                MinAltitude = 1f,
-                ClearArea = true
-            }));
-
+            AddCustomLocation("StaminaGreydwarf", Heightmap.Biome.Meadows, 1000f, 150f, 15, 4f, false, 1f, true, false, true);
+            AddCustomLocation("StaminaTroll", Heightmap.Biome.BlackForest, 8500f, 150f, 15, 4f, false, 1f, true, false, true);
+            AddCustomLocation("StaminaWraith", Heightmap.Biome.Swamp, 8500f, 150f, 15, 4f, false, 1f, true, false, true);
 
             Jotunn.Logger.LogInfo("Loaded Locations");
+        }
 
+        private void AddCustomLocation(string prefabName, Heightmap.Biome biome, float maxAltitude, float minDistanceFromSimilar, int quantity, float exteriorRadius, bool randomRotation, float minAltitude, bool clearArea, bool unique, bool priotized)
+        {
+            GameObject locationContainer = ZoneManager.Instance.CreateLocationContainer(assetBundle.LoadAsset<GameObject>(prefabName));
+            ZoneManager.Instance.AddCustomLocation(new CustomLocation(locationContainer, true, new LocationConfig
+            {
+                Biome = biome,
+                MaxAltitude = maxAltitude,
+                MinDistanceFromSimilar = minDistanceFromSimilar,
+                Unique = unique,
+                Quantity = quantity,
+                Priotized = priotized,
+                ExteriorRadius = exteriorRadius,
+                RandomRotation = randomRotation,
+                MinAltitude = minAltitude,
+                ClearArea = clearArea
+            }));
         }
 
         private void AddVegetation()
         {
-            var contentConfigs = GetJson2();
+            var contentConfigs = GetJson<EVAConfiguration>(configPath2);
 
             foreach (var config in contentConfigs)
             {
                 try
                 {
-                    if (config.MistlandsLocations == true)
+                    if (config.Locations.MistlandsLocations)
                     {
-                        GameObject HeavymetalVein = assetBundle.LoadAsset<GameObject>("HeavymetalVein");
-                        CustomVegetation customVegetation = new CustomVegetation(HeavymetalVein, true, new VegetationConfig
-                        {
-                            Max = 3f,
-                            Min = 1f,
-                            GroupSizeMin = 1,
-                            GroupSizeMax = 2,
-                            GroupRadius = 12f,
-                            BlockCheck = false,
-                            Biome = Heightmap.Biome.Mistlands,
-                            MinAltitude = 0f,
-                            MaxAltitude = 1000f,
-                            MaxTilt = 50f
-                        });
-                        ZoneManager.Instance.AddCustomVegetation(customVegetation);
+                        AddCustomVegetation("HeavymetalVein", Heightmap.Biome.Mistlands, 3f, 1f, 1, 2, 12f, false, 0f, 1000f, 50f, true, false);
                     }
                     else
                     {
                         Jotunn.Logger.LogInfo("EVA Mistlands locations are turned off");
                     }
-                    if (config.DeepNorthLocations == true)
+
+                    if (config.Locations.DeepNorthLocations)
                     {
-                        GameObject FrometalVein = assetBundle.LoadAsset<GameObject>("FrometalVein_frac");
-                        CustomVegetation customVegetation1 = new CustomVegetation(FrometalVein, true, new VegetationConfig
-                        {
-                            Max = 1f,
-                            GroupSizeMin = 1,
-                            GroupSizeMax = 1,
-                            GroupRadius = 25f,
-                            BlockCheck = true,
-                            Biome = Heightmap.Biome.DeepNorth,
-                            MinAltitude = 5f,
-                            MaxTilt = 20f
-                        });
-                        ZoneManager.Instance.AddCustomVegetation(customVegetation1);
+                        AddCustomVegetation("FrometalVein_frac", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 1, 25f, true, 5f, 1000f, 20f, true, false);
+
+                        AddCustomVegetation("EVA_Rock1", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock2", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock3", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 1, 100f, true, 5f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock4", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock5", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock6", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock7", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock8", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 1, 100f, true, 5f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock9", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock10", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock11", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock12", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Rock13", Heightmap.Biome.DeepNorth, 1f, 1f, 1, 1, 50f, true, 1f, 1000f, 20f, true, false);
+
+                        AddCustomVegetation("EVA_Tree1", Heightmap.Biome.DeepNorth, 2f, 1f, 1, 3, 50f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Tree2", Heightmap.Biome.DeepNorth, 2f, 1f, 1, 3, 50f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Tree3", Heightmap.Biome.DeepNorth, 2f, 1f, 1, 3, 50f, true, 1f, 1000f, 20f, true, false);
+
+                        AddCustomVegetation("EVA_Bush1", Heightmap.Biome.DeepNorth, 3f, 1f, 2, 3, 4f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_Bush2", Heightmap.Biome.DeepNorth, 3f, 1f, 2, 3, 4f, true, 1f, 1000f, 20f, true, false);
+
+                        AddCustomVegetation("Pickable_Snowgil_Shroom", Heightmap.Biome.DeepNorth, 4f, 1f, 2, 2, 70f, true, 1f, 1000f, 20f, true, false);
                     }
                     else
                     {
                         Jotunn.Logger.LogInfo("EVA DeepNorth locations are turned off");
                     }
-                    if (config.AshlandsLocations == true)
+
+                    if (config.Locations.AshlandsLocations)
                     {
-                        GameObject BurningTree = assetBundle.LoadAsset<GameObject>("BurningTree");
-                        CustomVegetation customVegetation2 = new CustomVegetation(BurningTree, true, new VegetationConfig
-                        {
-                            Max = 2f,
-                            GroupSizeMin = 1,
-                            GroupSizeMax = 4,
-                            GroupRadius = 60f,
-                            BlockCheck = true,
-                            Biome = Heightmap.Biome.AshLands,
-                            MinAltitude = 5f,
-                            MaxTilt = 20f
-                        });
-                        ZoneManager.Instance.AddCustomVegetation(customVegetation2);
+                        AddCustomVegetation("EVA_SutRock1", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock2", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock3", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock4", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock5", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock6", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock7", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock8", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock9", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock10", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 5f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_SutRock11", Heightmap.Biome.AshLands, 1f, 1f, 1, 1, 50f, true, 1f, 1000f, 20f, true, false);
+
+                        AddCustomVegetation("EVA_BurningTree1", Heightmap.Biome.AshLands, 1f, 1f, 1, 1, 35f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_BurningTree2", Heightmap.Biome.AshLands, 1f, 1f, 1, 2, 15, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_BurningTree3", Heightmap.Biome.AshLands, 1f, 1f, 1, 1, 65f, true, 1f, 1000f, 20f, true, false);
+                        sfxAssetNames.AddRange(new List<string> { "EVA_BurningTree1", "EVA_BurningTree2", "EVA_BurningTree3" });
+
+                        AddCustomVegetation("EVA_BurningBush1", Heightmap.Biome.AshLands, 3f, 1f, 2, 3, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_BurningBush2", Heightmap.Biome.AshLands, 3f, 1f, 2, 3, 10f, true, 1f, 1000f, 20f, true, false);
+                        AddCustomVegetation("EVA_BurningBush3", Heightmap.Biome.AshLands, 3f, 1f, 2, 3, 10f, true, 1f, 1000f, 20f, true, false);
+
+                        AddCustomVegetation("Pickable_Emberbloom", Heightmap.Biome.AshLands, 3f, 1f, 2, 3, 70f, true, 1f, 1000f, 20f, true, false);
                     }
                     else
                     {
                         Jotunn.Logger.LogInfo("EVA Ashlands locations are turned off");
                     }
-
                 }
                 catch (Exception e)
                 {
-                    Jotunn.Logger.LogError($"Loading config for {config.MistlandsLocations},{config.DeepNorthLocations},{config.AshlandsLocations} failed. {e.Message} {e.StackTrace}");
+                    Jotunn.Logger.LogError($"Loading config for Mistlands:{config.Locations.MistlandsLocations}, DeepNorth:{config.Locations.DeepNorthLocations}, Ashlands:{config.Locations.AshlandsLocations} failed. {e.Message} {e.StackTrace}");
                 }
             }
-
 
             Jotunn.Logger.LogInfo("Loaded Vegetation");
         }
 
+        private void AddCustomVegetation(string prefabName, Heightmap.Biome biome, float max, float min, int groupSizeMin, int groupSizeMax, float groupRadius, bool blockCheck, float minAltitude, float maxAltitude, float maxTilt, bool unique, bool priotized)
+        {
+            GameObject vegetationPrefab = assetBundle.LoadAsset<GameObject>(prefabName);
+            CustomVegetation customVegetation = new CustomVegetation(vegetationPrefab, true, new VegetationConfig
+            {
+                Max = max,
+                Min = min,
+                GroupSizeMin = groupSizeMin,
+                GroupSizeMax = groupSizeMax,
+                GroupRadius = groupRadius,
+                BlockCheck = blockCheck,
+                Biome = biome,
+                MinAltitude = minAltitude,
+                MaxAltitude = maxAltitude,
+                MaxTilt = maxTilt
+            });
+            ZoneManager.Instance.AddCustomVegetation(customVegetation);
+        }
+
         private void ModDrops()
         {
-            var contentConfigs = GetJson2();
+            var contentConfigs = GetJson<EVAConfiguration>(configPath2);
 
             foreach (var config in contentConfigs)
             {
                 try
                 {
-                    if(config.MistlandsLocations == false)
+                    if(config.Locations.MistlandsLocations == false)
                     {
                         ItemDrop prefabpick = PrefabManager.Cache.GetPrefab<ItemDrop>("PickaxeBlackMetal");
                         prefabpick.m_itemData.m_shared.m_toolTier = 5;
                     }
 
-                    if (config.DeepNorth == true)
+                    if (config.Content.DeepNorth == true)
                     {
                         MineRock5 prefab2b = PrefabManager.Cache.GetPrefab<MineRock5>("ice_rock1_frac");
                         var item2 = ObjectDB.instance.GetItemPrefab("PrimordialIce");
@@ -347,394 +387,279 @@ namespace EpicValheimsAdditions
                 }
                 catch (Exception e)
                 {
-                    Jotunn.Logger.LogError($"Loading config for {config.Mistlands},{config.DeepNorth} failed. {e.Message} {e.StackTrace}");
+                    Jotunn.Logger.LogError($"Loading config for {config.Content.Mistlands},{config.Content.DeepNorth} failed. {e.Message} {e.StackTrace}");
                 }
             }
         }
 
         private void CreateCraftingPieces()
         {
-            GameObject gameObject = assetBundle.LoadAsset<GameObject>("piece_alchemystation");
-            Piece component = gameObject.GetComponent<Piece>();
-            component.m_name = "Inscription Table";
-            component.m_description = "Rune Crafting/Upgrading.";
-            CraftingStation component2 = gameObject.GetComponent<CraftingStation>();
-            component2.m_name = "Inscription Table";
-            CustomPiece customPiece = new CustomPiece(gameObject, true, new PieceConfig
+            LoadAndRegisterAsset("piece_alchemystation", CustomAssetType.Piece, pieceConfig: new PieceConfig
             {
                 PieceTable = "_HammerPieceTable",
                 CraftingStation = "piece_workbench",
                 AllowedInDungeons = false,
-                Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FineWood",
-                                Amount = 15,
-                                Recover = true
-                        },
-                        new RequirementConfig {
-                            Item = "Coal",
-                                Amount = 10,
-                                Recover = true
-                        },
-                        new RequirementConfig {
-                            Item = "Bronze",
-                                Amount = 5,
-                                Recover = true
-                        }
+                Requirements = new RequirementConfig[]
+                {
+                    new RequirementConfig
+                    {
+                        Item = "FineWood",
+                        Amount = 15,
+                        Recover = true
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "Coal",
+                        Amount = 10,
+                        Recover = true
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "Bronze",
+                        Amount = 5,
+                        Recover = true
                     }
+                }
             });
-            PieceManager.Instance.AddPiece(customPiece);
-            ///
-            GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("piece_thorsforge");
-            CustomPiece customPiece5 = new CustomPiece(gameObject5, true, new PieceConfig
+
+            LoadAndRegisterAsset("piece_thorsforge", CustomAssetType.Piece, pieceConfig: new PieceConfig
             {
                 PieceTable = "_HammerPieceTable",
                 AllowedInDungeons = false,
-                Requirements = new RequirementConfig[] {
-
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 20,
-                                Recover = true
-                        },
-                        new RequirementConfig {
-                            Item = "Thunderstone",
-                                Amount = 10,
-                                Recover = true
-                        },
-                        new RequirementConfig {
-                            Item = "Tar",
-                                Amount = 5,
-                                Recover = true
-                        },
-                        new RequirementConfig {
-                            Item = "YagluthDrop",
-                                Amount = 1,
-                                Recover = true
-                        }
+                Requirements = new RequirementConfig[]
+                {
+                    new RequirementConfig
+                    {
+                        Item = "YggdrasilWood",
+                        Amount = 20,
+                        Recover = true
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "Thunderstone",
+                        Amount = 10,
+                        Recover = true
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "Tar",
+                        Amount = 5,
+                        Recover = true
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "YagluthDrop",
+                        Amount = 1,
+                        Recover = true
                     }
+                }
             });
-            PieceManager.Instance.AddPiece(customPiece5);
 
             Jotunn.Logger.LogInfo("Loaded CraftingPieces");
         }
 
-        private void ModThorsForgeLevel()
+        private void ModCraftingStationLevel(string craftingStationPrefabName)
         {
-            string piece = "piece_thorsforge";
-            StationExtension station = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext1").AddComponent<StationExtension>();
-            station.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station.m_maxStationDistance = 50;
-            station.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station1 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext2").AddComponent<StationExtension>();
-            station1.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station1.m_maxStationDistance = 50;
-            station1.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station2 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext3").AddComponent<StationExtension>();
-            station2.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station2.m_maxStationDistance = 50;
-            station2.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station3 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext4").AddComponent<StationExtension>();
-            station3.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station3.m_maxStationDistance = 50;
-            station3.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station4 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext5").AddComponent<StationExtension>();
-            station4.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station4.m_maxStationDistance = 50;
-            station4.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station5 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext6").AddComponent<StationExtension>();
-            station5.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station5.m_maxStationDistance = 50;
-            station5.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            Jotunn.Logger.LogInfo("Updated Thors Forge level");
+            StationExtension[] stationExtensions = new StationExtension[6];
+            string[] extensionNames = new string[] { "forge_ext1", "forge_ext2", "forge_ext3", "forge_ext4", "forge_ext5", "forge_ext6" };
+
+            for (int i = 0; i < extensionNames.Length; i++)
+            {
+                StationExtension station = PrefabManager.Cache.GetPrefab<GameObject>(extensionNames[i]).AddComponent<StationExtension>();
+                station.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(craftingStationPrefabName);
+                station.m_maxStationDistance = 50;
+                station.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
+                stationExtensions[i] = station;
+            }
+
+            Jotunn.Logger.LogInfo($"Updated {craftingStationPrefabName} level");
         }
 
-        private void ModAlchemyLevel()
+        private void ModCraftingStationLevels()
         {
-            string piece = "piece_alchemystation";
-            StationExtension station = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext1").AddComponent<StationExtension>();
-            station.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station.m_maxStationDistance = 50;
-            station.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station1 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext2").AddComponent<StationExtension>();
-            station1.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station1.m_maxStationDistance = 50;
-            station1.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station2 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext3").AddComponent<StationExtension>();
-            station2.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station2.m_maxStationDistance = 50;
-            station2.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station3 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext4").AddComponent<StationExtension>();
-            station3.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station3.m_maxStationDistance = 50;
-            station3.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station4 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext5").AddComponent<StationExtension>();
-            station4.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station4.m_maxStationDistance = 50;
-            station4.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            StationExtension station5 = PrefabManager.Cache.GetPrefab<GameObject>("forge_ext6").AddComponent<StationExtension>();
-            station5.m_craftingStation = PrefabManager.Cache.GetPrefab<CraftingStation>(piece);
-            station5.m_maxStationDistance = 50;
-            station5.m_connectionPrefab = PrefabManager.Cache.GetPrefab<GameObject>("vfx_ExtensionConnection");
-            Jotunn.Logger.LogInfo("Updated Alchemystation level");
-
+            ModCraftingStationLevel("piece_thorsforge");
+            ModCraftingStationLevel("piece_alchemystation");
         }
 
         private void CreateIngots_Scales()
         {
-
-            GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("Heavyscale");
-            ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
-            component4.m_itemData.m_dropPrefab = gameObject4;
-            component4.m_itemData.m_shared.m_name = "Heavyscale";
-            component4.m_itemData.m_shared.m_description = "A scale, which is quite heavy";
-            CustomItem customItem4 = new CustomItem(gameObject4, true);
-            ItemManager.Instance.AddItem(customItem4);
-
-            GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("Drakescale");
-            ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
-            component6.m_itemData.m_dropPrefab = gameObject6;
-            component6.m_itemData.m_shared.m_name = "Drakescale";
-            component6.m_itemData.m_shared.m_description = "A frosty scale, cold to the touch";
-            CustomItem customItem6 = new CustomItem(gameObject6, true);
-            ItemManager.Instance.AddItem(customItem6);
-
-            GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("Forgedscale");
-            ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
-            component8.m_itemData.m_dropPrefab = gameObject8;
-            component8.m_itemData.m_shared.m_name = "Forgedscale";
-            component8.m_itemData.m_shared.m_description = "A scale, forged by a master";
-            CustomItem customItem8 = new CustomItem(gameObject8, true);
-            ItemManager.Instance.AddItem(customItem8);
-
-            GameObject oreheavymetal = assetBundle.LoadAsset<GameObject>("OreHeavymetal");
-            CustomItem oreheavymetal1 = new CustomItem(oreheavymetal, true);
-            ItemManager.Instance.AddItem(oreheavymetal1);
-
-            GameObject gameObject33 = assetBundle.LoadAsset<GameObject>("HeavymetalBar");
-            CustomItem customItem33 = new CustomItem(gameObject33, true);
-            ItemManager.Instance.AddItem(customItem33);
-
-            GameObject orefrometal = assetBundle.LoadAsset<GameObject>("OreFrometal");
-            CustomItem orefrometal1 = new CustomItem(orefrometal, true);
-            ItemManager.Instance.AddItem(orefrometal1);
-
-            GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("FrometalBar");
-            CustomItem customItem5 = new CustomItem(gameObject5, true);
-            ItemManager.Instance.AddItem(customItem5);
-
-            GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("DeepAbyssEssence");
-            CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
-            {
-                Amount = 5,
-                CraftingStation = "piece_thorsforge",
-                Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 5
-                        },
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 5
-                        },
-                        new RequirementConfig {
-                            Item = "TrophyHelDemon",
-                                Amount = 1
-                        }
-                    }
-            });
-            ItemManager.Instance.AddItem(customItem2);
+            LoadAndRegisterAsset("Heavyscale", CustomAssetType.Item);
+            LoadAndRegisterAsset("Drakescale", CustomAssetType.Item);
+            LoadAndRegisterAsset("Forgedscale", CustomAssetType.Item);
+            LoadAndRegisterAsset("OreHeavymetal", CustomAssetType.Item);
+            LoadAndRegisterAsset("HeavymetalBar", CustomAssetType.Item);
+            LoadAndRegisterAsset("OreFrometal", CustomAssetType.Item);
+            LoadAndRegisterAsset("FrometalBar", CustomAssetType.Item);
+            LoadAndRegisterAsset("NjordsTearstone", CustomAssetType.Item);
+            LoadAndRegisterAsset("DeepAbyssEssence", CustomAssetType.Item);
 
             Jotunn.Logger.LogInfo("Loaded Ingots/scales/ore");
         }
 
-        private void RegisterDeepAbyssWeapons()
-        {
-            GameObject gameObject = assetBundle.LoadAsset<GameObject>("TridentDeepAbyss");
-            CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
-            {
-                Amount = 1,
-                CraftingStation = "piece_thorsforge",
-                Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "DeepAbyssEssence",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-            });
-            ItemManager.Instance.AddItem(customItem);
-
-            GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("BowDeepAbyss");
-            CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
-            {
-                Amount = 1,
-                CraftingStation = "piece_thorsforge",
-                Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "DeepAbyssEssence",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-            });
-            ItemManager.Instance.AddItem(customItem2);
-
-            GameObject gameObject3 = assetBundle.LoadAsset<GameObject>("GreatSwordDeepAbyss");
-            CustomItem customItem3 = new CustomItem(gameObject3, true, new ItemConfig
-            {
-                Amount = 1,
-                CraftingStation = "piece_thorsforge",
-                Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "DeepAbyssEssence",
-                                Amount = 60,
-                                AmountPerLevel = 40
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 40,
-                                AmountPerLevel = 20
-                        }
-                    }
-            });
-            ItemManager.Instance.AddItem(customItem3);
-            Jotunn.Logger.LogInfo("Loaded DeepAbyssWeapons");
-        }
-
         private void RegisterBossStuff()
         {
-            GameObject Golden_Greydwarf_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Greydwarf_Miniboss");
-            CustomPrefab Golden_Greydwarf_Miniboss1 = new CustomPrefab(Golden_Greydwarf_Miniboss, true);
-            PrefabManager.Instance.AddPrefab(Golden_Greydwarf_Miniboss1);
-            GameObject Golden_Troll_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Troll_Miniboss");
-            CustomPrefab Golden_Troll_Miniboss1 = new CustomPrefab(Golden_Troll_Miniboss, true);
-            PrefabManager.Instance.AddPrefab(Golden_Troll_Miniboss1);
-            GameObject Golden_Wraith_Miniboss = assetBundle.LoadAsset<GameObject>("Golden_Wraith_Miniboss");
-            CustomPrefab Golden_Wraith_Miniboss1 = new CustomPrefab(Golden_Wraith_Miniboss, true);
-            PrefabManager.Instance.AddPrefab(Golden_Wraith_Miniboss1);
-            GameObject JotunnBoss = assetBundle.LoadAsset<GameObject>("Jotunn");
-            CustomPrefab JotunnBoss1 = new CustomPrefab(JotunnBoss, true);
-            PrefabManager.Instance.AddPrefab(JotunnBoss1);
+            LoadAndRegisterAsset("Golden_Greydwarf_Miniboss", CustomAssetType.Prefab);
+            LoadAndRegisterAsset("Golden_Troll_Miniboss", CustomAssetType.Prefab);
+            LoadAndRegisterAsset("Golden_Wraith_Miniboss", CustomAssetType.Prefab);
+            LoadAndRegisterAsset("Jotunn", CustomAssetType.Prefab);
 
-            GameObject Jotunn_Groundslam = assetBundle.LoadAsset<GameObject>("Jotunn_Groundslam");
-            CustomItem Jotunn_Groundslam1 = new CustomItem(Jotunn_Groundslam, true);
-            ItemManager.Instance.AddItem(Jotunn_Groundslam1);
-            GameObject Jotunn_Groundslam2 = assetBundle.LoadAsset<GameObject>("Jotunn_Groundslam2");
-            CustomItem Jotunn_Groundslam21 = new CustomItem(Jotunn_Groundslam2, true);
-            ItemManager.Instance.AddItem(Jotunn_Groundslam21);
-            GameObject Jotunn_Shoot = assetBundle.LoadAsset<GameObject>("Jotunn_Shoot");
-            CustomItem Jotunn_Shoot1 = new CustomItem(Jotunn_Shoot, true);
-            ItemManager.Instance.AddItem(Jotunn_Shoot1);
+            LoadAndRegisterAsset("Jotunn_Groundslam", CustomAssetType.Item);
+            LoadAndRegisterAsset("Jotunn_Groundslam2", CustomAssetType.Item);
+            LoadAndRegisterAsset("Jotunn_Shoot", CustomAssetType.Item);
 
-            GameObject HelDemon = assetBundle.LoadAsset<GameObject>("HelDemon");
-            CustomPrefab HelDemon1 = new CustomPrefab(HelDemon, true);
-            PrefabManager.Instance.AddPrefab(HelDemon1);
+            LoadAndRegisterAsset("HelDemon", CustomAssetType.Prefab);
 
-            GameObject BlazingMace = assetBundle.LoadAsset<GameObject>("BlazingMace");
-            CustomItem BlazingMace1 = new CustomItem(BlazingMace, true);
-            ItemManager.Instance.AddItem(BlazingMace1);
-            GameObject BlazingMacetwo = assetBundle.LoadAsset<GameObject>("BlazingMace2");
-            CustomItem BlazingMace2 = new CustomItem(BlazingMacetwo, true);
-            ItemManager.Instance.AddItem(BlazingMace2);
-            GameObject BlazingMacethree = assetBundle.LoadAsset<GameObject>("BlazingMace3");
-            CustomItem BlazingMace3 = new CustomItem(BlazingMacethree, true);
-            ItemManager.Instance.AddItem(BlazingMace3);
-            GameObject BlazingMacefour = assetBundle.LoadAsset<GameObject>("BlazingMace4");
-            CustomItem BlazingMace4 = new CustomItem(BlazingMacefour, true);
-            ItemManager.Instance.AddItem(BlazingMace4);
-            GameObject BlazingShield = assetBundle.LoadAsset<GameObject>("BlazingShield");
-            CustomItem BlazingShield1 = new CustomItem(BlazingShield, true);
-            ItemManager.Instance.AddItem(BlazingShield1);
-            GameObject EVA_BlazingHelm = assetBundle.LoadAsset<GameObject>("EVA_BlazingHelm");
-            CustomItem EVA_BlazingHelm1 = new CustomItem(EVA_BlazingHelm, true);
-            ItemManager.Instance.AddItem(EVA_BlazingHelm1);
-            GameObject EVA_BlazingChest = assetBundle.LoadAsset<GameObject>("EVA_BlazingChest");
-            CustomItem EVA_BlazingChest1 = new CustomItem(EVA_BlazingChest, true);
-            ItemManager.Instance.AddItem(EVA_BlazingChest1);
-            GameObject EVA_BlazingBoots = assetBundle.LoadAsset<GameObject>("EVA_BlazingBoots");
-            CustomItem EVA_BlazingBoots1 = new CustomItem(EVA_BlazingBoots, true);
-            ItemManager.Instance.AddItem(EVA_BlazingBoots1);
-            GameObject Blazing_Nova = assetBundle.LoadAsset<GameObject>("Blazing_Nova");
-            CustomItem Blazing_Nova1 = new CustomItem(Blazing_Nova, true);
-            ItemManager.Instance.AddItem(Blazing_Nova1);
-            GameObject Blazing_Meteors = assetBundle.LoadAsset<GameObject>("Blazing_Meteors");
-            CustomItem Blazing_Meteors1 = new CustomItem(Blazing_Meteors, true);
-            ItemManager.Instance.AddItem(Blazing_Meteors1);
-            GameObject Blazing_Shoot = assetBundle.LoadAsset<GameObject>("Blazing_Shoot");
-            CustomItem Blazing_Shoot1 = new CustomItem(Blazing_Shoot, true);
-            ItemManager.Instance.AddItem(Blazing_Shoot1);
+            LoadAndRegisterAsset("BlazingMace", CustomAssetType.Item);
+            LoadAndRegisterAsset("BlazingMace2", CustomAssetType.Item);
+            LoadAndRegisterAsset("BlazingMace3", CustomAssetType.Item);
+            LoadAndRegisterAsset("BlazingMace4", CustomAssetType.Item);
+            LoadAndRegisterAsset("BlazingShield", CustomAssetType.Item);
+            LoadAndRegisterAsset("EVA_BlazingHelm", CustomAssetType.Item);
+            LoadAndRegisterAsset("EVA_BlazingChest", CustomAssetType.Item);
+            LoadAndRegisterAsset("EVA_BlazingBoots", CustomAssetType.Item);
+            LoadAndRegisterAsset("Blazing_Nova", CustomAssetType.Item);
+            LoadAndRegisterAsset("Blazing_Meteors", CustomAssetType.Item);
+            LoadAndRegisterAsset("Blazing_Shoot", CustomAssetType.Item);
 
-            GameObject SvartalfarQueen = assetBundle.LoadAsset<GameObject>("SvartalfarQueen");
-            CustomPrefab SvartalfarQueen1 = new CustomPrefab(SvartalfarQueen, true);
-            PrefabManager.Instance.AddPrefab(SvartalfarQueen1);
-            GameObject SvarTentaRoot = assetBundle.LoadAsset<GameObject>("SvarTentaRoot");
-            CustomPrefab SvarTentaRoot1 = new CustomPrefab(SvarTentaRoot, true);
-            PrefabManager.Instance.AddPrefab(SvarTentaRoot1);
+            LoadAndRegisterAsset("SvartalfarQueen", CustomAssetType.Prefab);
+            LoadAndRegisterAsset("SvarTentaRoot", CustomAssetType.Prefab);
 
-            GameObject SvartalfarQueenGreatSword = assetBundle.LoadAsset<GameObject>("SvartalfarQueenGreatSword");
-            CustomItem SvartalfarQueenGreatSword1 = new CustomItem(SvartalfarQueenGreatSword, true);
-            ItemManager.Instance.AddItem(SvartalfarQueenGreatSword1);
-            GameObject SvartalfarQueenBow = assetBundle.LoadAsset<GameObject>("SvartalfarQueenBow");
-            CustomItem SvartalfarQueenBow1 = new CustomItem(SvartalfarQueenBow, true);
-            ItemManager.Instance.AddItem(SvartalfarQueenBow1);
-            GameObject SvartalfarQueenBowArrowStorm = assetBundle.LoadAsset<GameObject>("SvartalfarQueenBowArrowStorm");
-            CustomItem SvartalfarQueenBowArrowStorm1 = new CustomItem(SvartalfarQueenBowArrowStorm, true);
-            ItemManager.Instance.AddItem(SvartalfarQueenBowArrowStorm1);
-            GameObject SvartalfarQueen_rootspawn = assetBundle.LoadAsset<GameObject>("SvartalfarQueen_rootspawn");
-            CustomItem SvartalfarQueen_rootspawn1 = new CustomItem(SvartalfarQueen_rootspawn, true);
-            ItemManager.Instance.AddItem(SvartalfarQueen_rootspawn1);
+            LoadAndRegisterAsset("SvartalfarQueenGreatSword", CustomAssetType.Item);
+            LoadAndRegisterAsset("SvartalfarQueenBow", CustomAssetType.Item);
+            LoadAndRegisterAsset("SvartalfarQueenBowArrowStorm", CustomAssetType.Item);
+            LoadAndRegisterAsset("SvartalfarQueen_rootspawn", CustomAssetType.Item);
 
-            GameObject TrophyHelDemon = assetBundle.LoadAsset<GameObject>("TrophyHelDemon");
-            CustomItem TrophyHelDemon1 = new CustomItem(TrophyHelDemon, true);
-            ItemManager.Instance.AddItem(TrophyHelDemon1);
+            LoadAndRegisterAsset("TrophyHelDemon", CustomAssetType.Item);
+            LoadAndRegisterAsset("TrophySvartalfarQueen", CustomAssetType.Item);
+            LoadAndRegisterAsset("TrophyJotunn", CustomAssetType.Item);
 
-            GameObject TrophySvartalfarQueen = assetBundle.LoadAsset<GameObject>("TrophySvartalfarQueen");
-            CustomItem TrophySvartalfarQueen1 = new CustomItem(TrophySvartalfarQueen, true);
-            ItemManager.Instance.AddItem(TrophySvartalfarQueen1);
-
-            GameObject TrophyJotunn = assetBundle.LoadAsset<GameObject>("TrophyJotunn");
-            CustomItem TrophyJotunn1 = new CustomItem(TrophyJotunn, true);
-            ItemManager.Instance.AddItem(TrophyJotunn1);
+            LoadAndRegisterAsset("HeavymetalPickaxeHead", CustomAssetType.Item);
+            LoadAndRegisterAsset("HeavymetalAxeHead", CustomAssetType.Item);
+            LoadAndRegisterAsset("FrometalPickaxeHead", CustomAssetType.Item);
+            LoadAndRegisterAsset("FrometalAxeHead", CustomAssetType.Item);
+            LoadAndRegisterAsset("FlametalPickaxeHead", CustomAssetType.Item);
+            LoadAndRegisterAsset("FlametalAxeHead", CustomAssetType.Item);
 
             Jotunn.Logger.LogInfo("Loaded BossStuff");
         }
 
         private void RegisterMiscItems()
         {
-            GameObject errordrop = assetBundle.LoadAsset<GameObject>("ErrorDrop");
-            CustomItem ErrorDrop = new CustomItem(errordrop, true);
-            ItemManager.Instance.AddItem(ErrorDrop);
-
-            GameObject EVA_AdminFood = assetBundle.LoadAsset<GameObject>("EVA_AdminFood");
-            CustomItem EVA_AdminFood1 = new CustomItem(EVA_AdminFood, true);
-            ItemManager.Instance.AddItem(EVA_AdminFood1);
+            LoadAndRegisterAsset("EVA_AdminFood", CustomAssetType.Item);
 
             Jotunn.Logger.LogInfo("Loaded MiscItems");
         }
 
+        private void RegisterAllPrefabs()
+        {
+            List<string> Prefabnames = new List<string>
+            {
+                "Burning_Log:sfx",
+                "Burning_Log_Half:sfx",
+                "BurningStump:sfx",
+                "FrozenStump",
+                "Frozen_Log",
+                "Frozen_Log_Half",
+                "sfx_magic_ice_explosion",
+                "Bear_Attack1",
+                "Bear_Attack2",
+                "Bear_Attack3",
+                "Bear_Attack5",
+                "Fairy_Attack1",
+                "Fairy_Attack_Projectile",
+                "Mariner_Attack1",
+                "Mariner_Attack2",
+                "Minotaur_Attack1",
+                "Minotaur_Attack2",
+                "Minotaur_Attack3",
+                "Minotaur_Attack4_kick",
+                "Skarab_Attack1",
+                "Skarab_Attack2",
+                "Skarab_Attack3",
+                "Blazing_ragdoll",
+                "FrostBear_Ragdoll",
+                "Greydwarf_elite_ragdoll_gold",
+                "Jotunn_ragdoll",
+                "Minotaur_Ragdoll",
+                "Skarab_Ragdoll",
+                "SvartalfarQueen_Ragdoll",
+                "Troll_ragdoll_gold",
+                "vfx_burningtreecut",
+                "vfx_burningtreecut_dead",
+                "vfx_offering_ashlands",
+                "lightningAOE:sfx",
+                "sfx_death_Skarab",
+                "sfx_minotaur_alerted",
+                "sfx_minotaur_attack_hit",
+                "vfx_generic_death 2",
+                "sfx_minotaur_death",
+                "vfx_fairy_hit",
+                "sfx_death_fairy",
+                "vfx_fairy_death",
+                "sfx_fairy_idle",
+                "sfx_fairy_alerted",
+                "sfx_fairy_attack_launch",
+                "vfx_FrostfireballHit",
+                "sfx_bear_hit",
+                "vfx_generic_death 1",
+                "sfx_bear_death",
+                "sfx_bear_alerted",
+                "sfx_bear_idle",
+                "vfx_mariner_death",
+                "sfx_mariner_death",
+                "sfx_Mariner_Alerted_Idle",
+                "bow_projectile_svar",
+                "spawn_arrows_svartalfr",
+                "sfx_death_gold",
+                "sfx_attack_hit_gold",
+                "Greydwarf_elite_attack_gold",
+                "troll_punch",
+                "troll_throw",
+                "troll_groundslam",
+                "wraith_melee_gold",
+                "vfx_frozentreecut",
+                "bow_projectile_frometal",
+                "bow_projectile_flametal",
+                "bow_projectile_abyss",
+                "frometalspear_projectile",
+                "flametalspear_projectile",
+                "heavymetalspear_projectile",
+                "Trident_projectile",
+                "fx_bear_pet",
+                "sfx_bear_love",
+                "Bear_Attack_cub",
+                "FrostBear_Ragdoll_Cub",
+                "vfx_ice_destroyed_fro",
+                "lightningAOE_Abyss",
+                "vfx_wraith_death_gold"
+            };
+
+            foreach (string Prefabname in Prefabnames)
+            {
+                LoadAndRegisterAsset(Prefabname, CustomAssetType.Prefab);
+            }
+        }
+
+        private void FixSfx()
+        {
+            foreach (string assetName in sfxAssetNames)
+            {
+                AudioSource mixerGroupSFX = PrefabManager.Cache.GetPrefab<AudioSource>("sfx_arrow_hit");
+                GameObject prefab = PrefabManager.Cache.GetPrefab<GameObject>(assetName);
+                prefab.GetComponentInChildren<AudioSource>().outputAudioMixerGroup = mixerGroupSFX.outputAudioMixerGroup;
+            }
+        }
+
         private void RegisterMistlands()
         {
-            var contentConfigs = GetJson2();
+            var contentConfigs = GetJson<EVAConfiguration>(configPath2);
 
             foreach (var config in contentConfigs)
             {
                 try
                 {
-                    if (config.Mistlands == true)
+                    if (config.Content.Mistlands == true)
                     {
-
-
                         CustomItemConversion OreHeavymetal = new CustomItemConversion(new SmelterConversionConfig
                         {
                             Station = "blastfurnace",
@@ -743,401 +668,458 @@ namespace EpicValheimsAdditions
                         });
                         ItemManager.Instance.AddItemConversion(OreHeavymetal);
 
-                        GameObject gameObject = assetBundle.LoadAsset<GameObject>("BowHeavymetal");
-                        ItemDrop component = gameObject.GetComponent<ItemDrop>();
-                        component.m_itemData.m_shared.m_maxDurability = 200;
-                        component.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 14,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 25,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 14,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem);
-                        GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("AtgeirHeavymetal");
-                        ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
-                        component2.m_itemData.m_shared.m_maxDurability = 200;
-                        component2.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 14,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 24,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 14,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem2);
-                        GameObject gameObject3 = assetBundle.LoadAsset<GameObject>("SledgeHeavymetal");
-                        ItemDrop component3 = gameObject3.GetComponent<ItemDrop>();
-                        component3.m_itemData.m_shared.m_maxDurability = 200;
-                        component3.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem3 = new CustomItem(gameObject3, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 14,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 28,
-                                AmountPerLevel = 6
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 14,
-                                AmountPerLevel = 5
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem3);
-                        GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("BattleaxeHeavymetal");
-                        ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
-                        component4.m_itemData.m_shared.m_maxDurability = 200;
-                        component4.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem4 = new CustomItem(gameObject4, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 16,
-                                AmountPerLevel = 6
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 30,
-                                AmountPerLevel = 7
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 12,
-                                AmountPerLevel = 6
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem4);
-                        GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("SpearHeavymetal");
-                        ItemDrop component5 = gameObject5.GetComponent<ItemDrop>();
-                        component5.m_itemData.m_shared.m_maxDurability = 200;
-                        component5.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem5 = new CustomItem(gameObject5, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 8,
-                                AmountPerLevel = 3
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 16,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 6,
-                                AmountPerLevel = 3
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem5);
-                        GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("KnifeHeavymetal");
-                        ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
-                        component6.m_itemData.m_shared.m_maxDurability = 200;
-                        component6.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem6 = new CustomItem(gameObject6, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 12,
-                                AmountPerLevel = 3
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 3,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem6);
-                        GameObject gameObject7 = assetBundle.LoadAsset<GameObject>("MaceHeavymetal");
-                        ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
-                        component7.m_itemData.m_shared.m_maxDurability = 200;
-                        component7.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem7 = new CustomItem(gameObject7, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 10,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 20,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 10,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem7);
-                        GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("GreatSwordHeavymetal");
-                        ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
-                        component8.m_itemData.m_shared.m_maxDurability = 200;
-                        component8.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem8 = new CustomItem(gameObject8, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 30,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 30,
-                                AmountPerLevel = 15
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 15,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem8);
-                        GameObject gameObject9 = assetBundle.LoadAsset<GameObject>("SwordHeavymetal");
-                        ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
-                        component9.m_itemData.m_shared.m_maxDurability = 200;
-                        component9.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem9 = new CustomItem(gameObject9, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 10,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 15,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 12,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem9);
-                        GameObject gameObject10 = assetBundle.LoadAsset<GameObject>("ShieldHeavymetal");
-                        ItemDrop component10 = gameObject10.GetComponent<ItemDrop>();
-                        component10.m_itemData.m_shared.m_name = "Heavymetal Shield";
-                        component10.m_itemData.m_shared.m_maxDurability = 200;
-                        component10.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem10 = new CustomItem(gameObject10, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 10,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 18,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 10,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem10);
-                        GameObject gameObject11 = assetBundle.LoadAsset<GameObject>("ShieldHeavymetalTower");
-                        ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
-                        component11.m_itemData.m_shared.m_maxDurability = 200;
-                        component11.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem11 = new CustomItem(gameObject11, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 20,
-                                AmountPerLevel = 8
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 25,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 15,
-                                AmountPerLevel = 8
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem11);
-                        GameObject gameObject12 = assetBundle.LoadAsset<GameObject>("AxeHeavymetal");
-                        ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
-                        component12.m_itemData.m_shared.m_maxDurability = 200;
-                        component12.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem12 = new CustomItem(gameObject12, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 20,
-                                AmountPerLevel = 8
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 15,
-                                AmountPerLevel = 8
-                        },
-                        new RequirementConfig {
-                            Item = "TrophySvartalfarQueen",
-                                Amount = 1
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem12);
-                        GameObject gameObject13 = assetBundle.LoadAsset<GameObject>("PickaxeHeavymetal");
-                        ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
-                        component13.m_itemData.m_shared.m_maxDurability = 200;
-                        component13.m_itemData.m_shared.m_durabilityPerLevel = 50;
-                        CustomItem customItem13 = new CustomItem(gameObject13, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 20,
-                                AmountPerLevel = 8
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "LinenThread",
-                                Amount = 15,
-                                AmountPerLevel = 8
-                        },
-                        new RequirementConfig {
-                            Item = "TrophySvartalfarQueen",
-                                Amount = 1
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem13);
+                        LoadAndRegisterAsset("SvartalfrQueenAltar_New", CustomAssetType.Prefab);
+                        LoadAndRegisterAsset("Vegvisir_SvartalfrQueen", CustomAssetType.Prefab);
 
-                        GameObject svartalfrqueenaltar = assetBundle.LoadAsset<GameObject>("SvartalfrQueenAltar_New");
-                        CustomPrefab svartalfrqueenaltar1 = new CustomPrefab(svartalfrqueenaltar, true);
-                        PrefabManager.Instance.AddPrefab(svartalfrqueenaltar1);
-
-                        GameObject Vegvisir_SvartalfrQueen = assetBundle.LoadAsset<GameObject>("Vegvisir_SvartalfrQueen");
-                        CustomPrefab Vegvisir_SvartalfrQueen1 = new CustomPrefab(Vegvisir_SvartalfrQueen, true);
-                        PrefabManager.Instance.AddPrefab(Vegvisir_SvartalfrQueen1);
-
-
-                        GameObject cursedEffigy = assetBundle.LoadAsset<GameObject>("CursedEffigy");
-                        CustomItem CursedEffigy = new CustomItem(cursedEffigy, true, new ItemConfig
+                        LoadAndRegisterAsset("CursedEffigy", CustomAssetType.Item, new ItemConfig
                         {
                             Amount = 1,
                             CraftingStation = "piece_alchemystation",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "HeavymetalBar",
-                                Amount = 20
-                        },
-                        new RequirementConfig {
-                            Item = "AncientSeed",
-                                Amount = 10
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 30
-                        }
-                    }
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 20
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AncientSeed",
+                                    Amount = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 30
+                                }
+                            }
                         });
-                        ItemManager.Instance.AddItem(CursedEffigy);
 
-                        GameObject darkfrometal = assetBundle.LoadAsset<GameObject>("FrostInfusedDarkMetal");
-                        CustomItem darkfrometal1 = new CustomItem(darkfrometal, true);
-                        ItemManager.Instance.AddItem(darkfrometal1);
+                        LoadAndRegisterAsset("BowHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 14,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 25,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 14,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("AtgeirHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 14,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 24,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 14,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("SledgeHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 14,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 28,
+                                    AmountPerLevel = 6
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 14,
+                                    AmountPerLevel = 5
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("BattleaxeHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 16,
+                                    AmountPerLevel = 6
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 30,
+                                    AmountPerLevel = 7
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 12,
+                                    AmountPerLevel = 6
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("SpearHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 8,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 16,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 6,
+                                    AmountPerLevel = 3
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("KnifeHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 12,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 3,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("MaceHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 10,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 20,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 10,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("GreatSwordHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 30,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 30,
+                                    AmountPerLevel = 15
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 15,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("SwordHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 10,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 15,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 12,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("ShieldHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 10,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 18,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 10,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("ShieldHeavymetalTower", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 20,
+                                    AmountPerLevel = 8
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 25,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 15,
+                                    AmountPerLevel = 8
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("AxeHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 5,
+                                    AmountPerLevel = 8
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 20,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 15,
+                                    AmountPerLevel = 8
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalAxeHead",
+                                    Amount = 1
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
+
+                        LoadAndRegisterAsset("PickaxeHeavymetal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalBar",
+                                    Amount = 5,
+                                    AmountPerLevel = 8
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 20,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "LinenThread",
+                                    Amount = 15,
+                                    AmountPerLevel = 8
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "HeavymetalPickaxeHead",
+                                    Amount = 1
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 200;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 50;
+                        });
 
                         Jotunn.Logger.LogInfo("Loaded EVA Mistlands content");
                     }
@@ -1149,7 +1131,7 @@ namespace EpicValheimsAdditions
                 }
                 catch (Exception e)
                 {
-                    Jotunn.Logger.LogError($"Loading config for {config.Mistlands} failed. {e.Message} {e.StackTrace}");
+                    Jotunn.Logger.LogError($"Loading config for {config.Content.Mistlands} failed. {e.Message} {e.StackTrace}");
                 }
             }
 
@@ -1158,17 +1140,14 @@ namespace EpicValheimsAdditions
 
         private void RegisterDeepnorth()
         {
-
-            var contentConfigs = GetJson2();
+            var contentConfigs = GetJson<EVAConfiguration>(configPath2);
 
             foreach (var config in contentConfigs)
             {
                 try
                 {
-                    if (config.DeepNorth == true)
+                    if (config.Content.DeepNorth == true)
                     {
-
-
                         CustomItemConversion OreFrometal = new CustomItemConversion(new SmelterConversionConfig
                         {
                             Station = "blastfurnace",
@@ -1177,434 +1156,568 @@ namespace EpicValheimsAdditions
                         });
                         ItemManager.Instance.AddItemConversion(OreFrometal);
 
-                        GameObject gameObject = assetBundle.LoadAsset<GameObject>("BowFrometal");
-                        ItemDrop component = gameObject.GetComponent<ItemDrop>();
-                        component.m_itemData.m_shared.m_maxDurability = 250;
-                        component.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 15,
-                                AmountPerLevel = 7
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 2,
-                                AmountPerLevel = 1
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem);
-                        GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("AtgeirFrometal");
-                        ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
-                        component2.m_itemData.m_shared.m_maxDurability = 250;
-                        component2.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 15,
-                                AmountPerLevel = 7
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem2);
-                        GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("SledgeFrometal");
-                        ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
-                        component4.m_itemData.m_shared.m_maxDurability = 250;
-                        component4.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem4 = new CustomItem(gameObject4, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 15,
-                                AmountPerLevel = 7
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 13,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem4);
-                        GameObject gameObject55 = assetBundle.LoadAsset<GameObject>("BattleaxeFrometal");
-                        ItemDrop component55 = gameObject55.GetComponent<ItemDrop>();
-                        component55.m_itemData.m_shared.m_maxDurability = 250;
-                        component55.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem55 = new CustomItem(gameObject55, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 15,
-                                AmountPerLevel = 7
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 10,
-                                AmountPerLevel = 6
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem55);
-                        GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("SpearFrometal");
-                        ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
-                        component6.m_itemData.m_shared.m_maxDurability = 250;
-                        component6.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem6 = new CustomItem(gameObject6, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 10,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem6);
-                        GameObject gameObject7 = assetBundle.LoadAsset<GameObject>("KnifeFrometal");
-                        ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
-                        component7.m_itemData.m_shared.m_maxDurability = 250;
-                        component7.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem7 = new CustomItem(gameObject7, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem7);
-                        GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("MaceFrometal");
-                        ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
-                        component8.m_itemData.m_shared.m_maxDurability = 250;
-                        component8.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem8 = new CustomItem(gameObject8, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 10,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 3,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem8);
-                        GameObject gameObject9 = assetBundle.LoadAsset<GameObject>("GreatSwordFrometal");
-                        ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
-                        component9.m_itemData.m_shared.m_maxDurability = 250;
-                        component9.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem9 = new CustomItem(gameObject9, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 30,
-                                AmountPerLevel = 15
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 15,
-                                AmountPerLevel = 8
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 10,
-                                AmountPerLevel = 6
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem9);
-                        GameObject gameObject10 = assetBundle.LoadAsset<GameObject>("SwordFrometal");
-                        ItemDrop component10 = gameObject10.GetComponent<ItemDrop>();
-                        component10.m_itemData.m_shared.m_maxDurability = 250;
-                        component10.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem10 = new CustomItem(gameObject10, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 10,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 3,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem10);
-                        GameObject ShieldFrometal = assetBundle.LoadAsset<GameObject>("ShieldFrometal");
-                        ItemDrop ItemDrop = ShieldFrometal.GetComponent<ItemDrop>();
-                        ItemDrop.m_itemData.m_shared.m_name = "Frometal Shield";
-                        ItemDrop.m_itemData.m_shared.m_maxDurability = 250;
-                        ItemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem ShieldFrometalBM = new CustomItem(ShieldFrometal, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(ShieldFrometalBM);
-                        GameObject gameObject11 = assetBundle.LoadAsset<GameObject>("ShieldFrometalTower");
-                        ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
-                        component11.m_itemData.m_shared.m_name = "Frometal Tower Shield";
-                        component11.m_itemData.m_shared.m_variants = 0;
-                        component11.m_itemData.m_shared.m_maxDurability = 250;
-                        component11.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem11 = new CustomItem(gameObject11, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 12,
-                                AmountPerLevel = 6
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 13,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem11);
-                        GameObject gameObject12 = assetBundle.LoadAsset<GameObject>("AxeFrometal");
-                        ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
-                        component12.m_itemData.m_shared.m_maxDurability = 250;
-                        component12.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem12 = new CustomItem(gameObject12, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
+                        LoadAndRegisterAsset("JotunnAltar", CustomAssetType.Prefab);
+                        LoadAndRegisterAsset("Vegvisir_Jotunn", CustomAssetType.Prefab);
 
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 3
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 2,
-                                AmountPerLevel = 1
-                        },
-                        new RequirementConfig {
-                            Item = "TrophyJotunn",
-                                Amount = 1
-                        }
-                    }
+                        LoadAndRegisterAsset("PrimordialIce", CustomAssetType.Item);
+                        LoadAndRegisterAsset("YmirsSoulEssence", CustomAssetType.Item);
+                        LoadAndRegisterAsset("UsarPelt", CustomAssetType.Item);
+                        LoadAndRegisterAsset("FaeDust", CustomAssetType.Item);
+                        LoadAndRegisterAsset("BearMeat", CustomAssetType.Item); 
+                        LoadAndRegisterAsset("SnowgillShroom", CustomAssetType.Item); 
+
+                        LoadAndRegisterAsset("ArrowFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 20,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "Feathers",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "Wood",
+                                    Amount = 8
+                                }
+                            }
                         });
-                        ItemManager.Instance.AddItem(customItem12);
-                        GameObject gameObject13 = assetBundle.LoadAsset<GameObject>("PickaxeFrometal");
-                        ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
-                        component13.m_itemData.m_shared.m_maxDurability = 250;
-                        component13.m_itemData.m_shared.m_durabilityPerLevel = 65;
-                        CustomItem customItem13 = new CustomItem(gameObject13, true, new ItemConfig
+                        // Mage
+                        LoadAndRegisterAsset("YggdrasilElixir", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_cauldron",
+                            MinStationLevel = 5,
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FaeDust",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "SnowgillShroom",
+                                    Amount = 6
+                                }
+                            }
+                        }); 
+                        // Health
+                        LoadAndRegisterAsset("GjallarhornGumbo", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_cauldron",
+                            MinStationLevel = 5,
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FaeDust",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BearMeat",
+                                    Amount = 4
+                                }
+                            }
+                        }); 
+                        // Stam
+                        LoadAndRegisterAsset("FrostbiteFuel", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_cauldron",
+                            MinStationLevel = 5,
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FaeDust",
+                                    Amount = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BearMeat",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "SnowgillShroom",
+                                    Amount = 2
+                                }
+                            }
+                        });
+
+                        LoadAndRegisterAsset("BowFrometal", CustomAssetType.Item, new ItemConfig
                         {
                             Amount = 1,
                             CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 20,
-                                AmountPerLevel = 10
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 15,
+                                    AmountPerLevel = 7
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 2,
+                                    AmountPerLevel = 1
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
                         },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 5,
-                                AmountPerLevel = 3
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 2,
-                                AmountPerLevel = 1
-                        },
-                        new RequirementConfig {
-                            Item = "TrophyJotunn",
-                                Amount = 1
-                        }
-                    }
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
                         });
-                        ItemManager.Instance.AddItem(customItem13);
 
-                        GameObject jotunnaltar = assetBundle.LoadAsset<GameObject>("JotunnAltar");
-                        CustomPrefab jotunnaltar1 = new CustomPrefab(jotunnaltar, true);
-                        PrefabManager.Instance.AddPrefab(jotunnaltar1);
-
-                        GameObject Vegvisir_Jotunn = assetBundle.LoadAsset<GameObject>("Vegvisir_Jotunn");
-                        CustomPrefab Vegvisir_Jotunn1 = new CustomPrefab(Vegvisir_Jotunn, true);
-                        PrefabManager.Instance.AddPrefab(Vegvisir_Jotunn1);
-
-                        GameObject ymirsSoulEssence = assetBundle.LoadAsset<GameObject>("YmirsSoulEssence");
-                        CustomItem YmirsSoulEssence = new CustomItem(ymirsSoulEssence, true, new ItemConfig
+                        LoadAndRegisterAsset("AtgeirFrometal", CustomAssetType.Item, new ItemConfig
                         {
                             Amount = 1,
-                            CraftingStation = "piece_alchemystation",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "FrometalBar",
-                                Amount = 20
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 15,
+                                    AmountPerLevel = 7
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
                         },
-                        new RequirementConfig {
-                            Item = "PrimordialIce",
-                                Amount = 20
-                        },
-                        new RequirementConfig {
-                            Item = "YggdrasilWood",
-                                Amount = 30
-                        }
-                    }
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
                         });
-                        ItemManager.Instance.AddItem(YmirsSoulEssence);
 
-                        GameObject primice = assetBundle.LoadAsset<GameObject>("PrimordialIce");
-                        CustomItem Primice = new CustomItem(primice, true);
-                        ItemManager.Instance.AddItem(Primice);
+                        LoadAndRegisterAsset("SledgeFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 15,
+                                    AmountPerLevel = 7
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 13,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("BattleaxeFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 15,
+                                    AmountPerLevel = 7
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 10,
+                                    AmountPerLevel = 6
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("SpearFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 10,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("KnifeFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 5,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("MaceFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 10,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 3,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("GreatSwordFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 30,
+                                    AmountPerLevel = 15
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 15,
+                                    AmountPerLevel = 8
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 10,
+                                    AmountPerLevel = 6
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("SwordFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 10,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 3,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "YggdrasilWood",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("ShieldFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_name = "Frometal Shield";
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("ShieldFrometalTower", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 12,
+                                    AmountPerLevel = 6
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 13,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_variants = 0;
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("AxeFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 5,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 5,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 2,
+                                    AmountPerLevel = 1
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalAxeHead",
+                                    Amount = 1
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
+
+                        LoadAndRegisterAsset("PickaxeFrometal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalBar",
+                                    Amount = 5,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "PrimordialIce",
+                                    Amount = 5,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "UsarPelt",
+                                    Amount = 2,
+                                    AmountPerLevel = 1
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "FrometalPickaxeHead",
+                                    Amount = 1
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 250;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 65;
+                        });
 
                         Jotunn.Logger.LogInfo("Loaded EVA DeepNorth content");
                     }
@@ -1616,7 +1729,7 @@ namespace EpicValheimsAdditions
                 }
                 catch (Exception e)
                 {
-                    Jotunn.Logger.LogError($"Loading config for {config.DeepNorth} failed. {e.Message} {e.StackTrace}");
+                    Jotunn.Logger.LogError($"Loading config for {config.Content.DeepNorth} failed. {e.Message} {e.StackTrace}");
                 }
             }
 
@@ -1624,378 +1737,556 @@ namespace EpicValheimsAdditions
 
         private void RegisterAshlands()
         {
-            var contentConfigs = GetJson2();
+            var contentConfigs = GetJson<EVAConfiguration>(configPath2);
 
             foreach (var config in contentConfigs)
             {
                 try
                 {
-                    if (config.Ashlands == true)
+                    if (config.Content.Ashlands == true)
                     {
-                        GameObject gameObject = assetBundle.LoadAsset<GameObject>("BowFlametal");
-                        ItemDrop component = gameObject.GetComponent<ItemDrop>();
-                        component.m_itemData.m_shared.m_maxDurability = 300;
-                        component.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem = new CustomItem(gameObject, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem);
-                        GameObject gameObject2 = assetBundle.LoadAsset<GameObject>("AtgeirFlametal");
-                        ItemDrop component2 = gameObject2.GetComponent<ItemDrop>();
-                        component2.m_itemData.m_shared.m_maxDurability = 300;
-                        component2.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem2 = new CustomItem(gameObject2, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem2);
-                        GameObject gameObject4 = assetBundle.LoadAsset<GameObject>("SledgeFlametal");
-                        ItemDrop component4 = gameObject4.GetComponent<ItemDrop>();
-                        component4.m_itemData.m_shared.m_maxDurability = 300;
-                        component4.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem4 = new CustomItem(gameObject4, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem4);
-                        GameObject gameObject5 = assetBundle.LoadAsset<GameObject>("BattleaxeFlametal");
-                        ItemDrop component5 = gameObject5.GetComponent<ItemDrop>();
-                        component5.m_itemData.m_shared.m_maxDurability = 300;
-                        component5.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem5 = new CustomItem(gameObject5, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 6,
-                                AmountPerLevel = 3
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 10,
-                                AmountPerLevel = 6
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem5);
-                        GameObject gameObject6 = assetBundle.LoadAsset<GameObject>("SpearFlametal");
-                        ItemDrop component6 = gameObject6.GetComponent<ItemDrop>();
-                        component6.m_itemData.m_shared.m_maxDurability = 300;
-                        component6.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem6 = new CustomItem(gameObject6, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 10,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem6);
-                        GameObject gameObject7 = assetBundle.LoadAsset<GameObject>("KnifeFlametal");
-                        ItemDrop component7 = gameObject7.GetComponent<ItemDrop>();
-                        component7.m_itemData.m_shared.m_maxDurability = 300;
-                        component7.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem7 = new CustomItem(gameObject7, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 8,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem7);
-                        GameObject gameObject8 = assetBundle.LoadAsset<GameObject>("MaceFlametal");
-                        ItemDrop component8 = gameObject8.GetComponent<ItemDrop>();
-                        component8.m_itemData.m_shared.m_maxDurability = 300;
-                        component8.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem8 = new CustomItem(gameObject8, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 10,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 3,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem8);
-                        GameObject gameObject9 = assetBundle.LoadAsset<GameObject>("GreatSwordFlametal");
-                        ItemDrop component9 = gameObject9.GetComponent<ItemDrop>();
-                        component9.m_itemData.m_shared.m_maxDurability = 300;
-                        component9.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem9 = new CustomItem(gameObject9, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 30,
-                                AmountPerLevel = 15
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 6,
-                                AmountPerLevel = 3
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 10,
-                                AmountPerLevel = 6
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem9);
-                        GameObject gameObject10 = assetBundle.LoadAsset<GameObject>("SwordFlametal");
-                        ItemDrop component10 = gameObject10.GetComponent<ItemDrop>();
-                        component10.m_itemData.m_shared.m_maxDurability = 300;
-                        component10.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem10 = new CustomItem(gameObject10, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 10,
-                                AmountPerLevel = 5
-                        },
-                        new RequirementConfig {
-                            Item = "LoxPelt",
-                                Amount = 3,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem10);
-                        GameObject ShieldFlametal = assetBundle.LoadAsset<GameObject>("ShieldFlametal");
-                        ItemDrop ItemDrop = ShieldFlametal.GetComponent<ItemDrop>();
-                        ItemDrop.m_itemData.m_shared.m_name = "Flametal Shield";
-                        ItemDrop.m_itemData.m_shared.m_maxDurability = 300;
-                        ItemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem ShieldFlametalBM = new CustomItem(ShieldFlametal, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(ShieldFlametalBM);
-                        GameObject gameObject11 = assetBundle.LoadAsset<GameObject>("ShieldFlametalTower");
-                        ItemDrop component11 = gameObject11.GetComponent<ItemDrop>();
-                        component11.m_itemData.m_shared.m_name = "Flametal Tower Shield";
-                        component11.m_itemData.m_shared.m_variants = 0;
-                        component11.m_itemData.m_shared.m_maxDurability = 300;
-                        component11.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem11 = new CustomItem(gameObject11, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 12,
-                                AmountPerLevel = 4
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 8,
-                                AmountPerLevel = 4
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem11);
-                        GameObject gameObject12 = assetBundle.LoadAsset<GameObject>("AxeFlametal");
-                        ItemDrop component12 = gameObject12.GetComponent<ItemDrop>();
-                        component12.m_itemData.m_shared.m_maxDurability = 300;
-                        component12.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem12 = new CustomItem(gameObject12, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "TrophyHelDemon",
-                                Amount = 1
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem12);
-                        GameObject gameObject13 = assetBundle.LoadAsset<GameObject>("PickaxeFlametal");
-                        ItemDrop component13 = gameObject13.GetComponent<ItemDrop>();
-                        component13.m_itemData.m_shared.m_maxDurability = 300;
-                        component13.m_itemData.m_shared.m_durabilityPerLevel = 75;
-                        CustomItem customItem13 = new CustomItem(gameObject13, true, new ItemConfig
-                        {
-                            Amount = 1,
-                            CraftingStation = "piece_thorsforge",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 20,
-                                AmountPerLevel = 10
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 4,
-                                AmountPerLevel = 2
-                        },
-                        new RequirementConfig {
-                            Item = "TrophyHelDemon",
-                                Amount = 1
-                        }
-                    }
-                        });
-                        ItemManager.Instance.AddItem(customItem13);
 
-                        GameObject blazingdamnedonealtar = assetBundle.LoadAsset<GameObject>("BlazingDamnedOneAltar");
-                        CustomPrefab blazingdamnedonealtar1 = new CustomPrefab(blazingdamnedonealtar, true);
-                        PrefabManager.Instance.AddPrefab(blazingdamnedonealtar1);
+                        LoadAndRegisterAsset("BlazingDamnedOneAltar", CustomAssetType.Prefab);
+                        LoadAndRegisterAsset("Vegvisir_BlazingDamnedOne", CustomAssetType.Prefab);
+                        LoadAndRegisterAsset("BurningWorldTreeFragment", CustomAssetType.Item);
+                        LoadAndRegisterAsset("MagmaGuck", CustomAssetType.Item);
+                        LoadAndRegisterAsset("AshenHide", CustomAssetType.Item);
+                        LoadAndRegisterAsset("MinotaurMeat", CustomAssetType.Item); 
+                        LoadAndRegisterAsset("Emberbloom", CustomAssetType.Item);
+                        LoadAndRegisterAsset("EmberbloomSeeds", CustomAssetType.Item);
+                        LoadAndRegisterAsset("FenrirsHeart", CustomAssetType.Item);
 
-                        GameObject Vegvisir_BlazingDamnedOne = assetBundle.LoadAsset<GameObject>("Vegvisir_BlazingDamnedOne");
-                        CustomPrefab Vegvisir_BlazingDamnedOne1 = new CustomPrefab(Vegvisir_BlazingDamnedOne, true);
-                        PrefabManager.Instance.AddPrefab(Vegvisir_BlazingDamnedOne1);
-
-                        GameObject burningfragment = assetBundle.LoadAsset<GameObject>("BurningWorldTreeFragment");
-                        CustomItem burningfragment1 = new CustomItem(burningfragment, true);
-                        ItemManager.Instance.AddItem(burningfragment1);
-
-                        GameObject fenrirsheart = assetBundle.LoadAsset<GameObject>("FenrirsHeart");
-                        CustomItem FenrirsHeart = new CustomItem(fenrirsheart, true, new ItemConfig
+                        LoadAndRegisterAsset("Sapling_Emberbloom", CustomAssetType.Piece, pieceConfig: new PieceConfig
+                        {
+                            PieceTable = "_CultivatorPieceTable",
+                            AllowedInDungeons = false,
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "EmberbloomSeeds",
+                                    Amount = 1,
+                                    Recover = false
+                                }
+                            }
+                        });
+                        LoadAndRegisterAsset("ArrowFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 20,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "Feathers",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "Wood",
+                                    Amount = 8
+                                }
+                            }
+                        });
+                        // Mage 
+                        LoadAndRegisterAsset("MoltenMagesMunch", CustomAssetType.Item, new ItemConfig
                         {
                             Amount = 1,
-                            CraftingStation = "piece_alchemystation",
-                            Requirements = new RequirementConfig[] {
-                        new RequirementConfig {
-                            Item = "Flametal",
-                                Amount = 20
-                        },
-                        new RequirementConfig {
-                            Item = "BurningWorldTreeFragment",
-                                Amount = 30
-                        }
-                    }
+                            CraftingStation = "piece_cauldron",
+                            MinStationLevel = 5,
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "MagmaGuck",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "Emberbloom",
+                                    Amount = 4
+                                }
+                            }
                         });
-                        ItemManager.Instance.AddItem(FenrirsHeart);
+                        // Health
+                        LoadAndRegisterAsset("AshenTitansFeast", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_cauldron",
+                            MinStationLevel = 5,
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "MagmaGuck",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "MinotaurMeat",
+                                    Amount = 4
+                                }
+                            }
+                        });
+                        // Stamina 
+                        LoadAndRegisterAsset("EruptionElixir", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_cauldron",
+                            MinStationLevel = 5,
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "MagmaGuck",
+                                    Amount = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "MinotaurMeat",
+                                    Amount = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "Emberbloom",
+                                    Amount = 1
+                                }
+                            }
+                        });
 
-                        
+
+                        LoadAndRegisterAsset("BowFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 20,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("AtgeirFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 20,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("SledgeFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 20,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("BattleaxeFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 20,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 6,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 10,
+                                    AmountPerLevel = 6
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("SpearFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 10,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 6,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("KnifeFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 8,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 6,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("MaceFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 10,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 3,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("GreatSwordFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 30,
+                                    AmountPerLevel = 15
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 6,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 10,
+                                    AmountPerLevel = 6
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("SwordFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 10,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 3,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("ShieldFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 6,
+                                    AmountPerLevel = 3
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_name = "Flametal Shield";
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("ShieldFlametalTower", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 12,
+                                    AmountPerLevel = 4
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 10,
+                                    AmountPerLevel = 5
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 8,
+                                    AmountPerLevel = 4
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_variants = 0;
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("AxeFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 5,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 3,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "FlametalAxeHead",
+                                    Amount = 1
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
+
+                        LoadAndRegisterAsset("PickaxeFlametal", CustomAssetType.Item, new ItemConfig
+                        {
+                            Amount = 1,
+                            CraftingStation = "piece_thorsforge",
+                            Requirements = new RequirementConfig[]
+                            {
+                                new RequirementConfig
+                                {
+                                    Item = "Flametal",
+                                    Amount = 5,
+                                    AmountPerLevel = 10
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "AshenHide",
+                                    Amount = 3,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "BurningWorldTreeFragment",
+                                    Amount = 4,
+                                    AmountPerLevel = 2
+                                },
+                                new RequirementConfig
+                                {
+                                    Item = "FlametalPickaxeHead",
+                                    Amount = 1
+                                }
+                            }
+                        },
+                        (itemDrop) =>
+                        {
+                            itemDrop.m_itemData.m_shared.m_maxDurability = 300;
+                            itemDrop.m_itemData.m_shared.m_durabilityPerLevel = 75;
+                        });
 
                         Jotunn.Logger.LogInfo("Loaded EVA Ashlands content");
                     }
@@ -2007,11 +2298,177 @@ namespace EpicValheimsAdditions
                 }
                 catch (Exception e)
                 {
-                    Jotunn.Logger.LogError($"Loading config for {config.Ashlands} failed. {e.Message} {e.StackTrace}");
+                    Jotunn.Logger.LogError($"Loading config for {config.Content.Ashlands} failed. {e.Message} {e.StackTrace}");
                 }
             }
 
 
+        }
+
+        private void RegisterDeepAbyss()
+        {
+            CustomItemConversion njordsTearstone = new CustomItemConversion(new SmelterConversionConfig
+            {
+                Station = "blastfurnace",
+                FromItem = "NjordsTearstone",
+                ToItem = "DeepAbyssEssence"
+            });
+            ItemManager.Instance.AddItemConversion(njordsTearstone);
+
+            LoadAndRegisterAsset("ArrowAbyss", CustomAssetType.Item, new ItemConfig
+            {
+                Amount = 20,
+                CraftingStation = "piece_thorsforge",
+                Requirements = new RequirementConfig[]
+                {
+                    new RequirementConfig
+                    {
+                        Item = "DeepAbyssEssence",
+                        Amount = 2
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "Feathers",
+                        Amount = 2
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "Wood",
+                        Amount = 8
+                    }
+                }
+            });
+
+            LoadAndRegisterAsset("TridentDeepAbyss", CustomAssetType.Item, new ItemConfig
+            {
+                Amount = 1,
+                CraftingStation = "piece_thorsforge",
+                Requirements = new RequirementConfig[]
+                {
+                    new RequirementConfig
+                    {
+                        Item = "DeepAbyssEssence",
+                        Amount = 20,
+                        AmountPerLevel = 10
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "YggdrasilWood",
+                        Amount = 8,
+                        AmountPerLevel = 4
+                    }
+                }
+            });
+
+            LoadAndRegisterAsset("BowDeepAbyss", CustomAssetType.Item, new ItemConfig
+            {
+                Amount = 1,
+                CraftingStation = "piece_thorsforge",
+                Requirements = new RequirementConfig[]
+                {
+                    new RequirementConfig
+                    {
+                        Item = "DeepAbyssEssence",
+                        Amount = 20,
+                        AmountPerLevel = 10
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "YggdrasilWood",
+                        Amount = 8,
+                        AmountPerLevel = 4
+                    }
+                }
+            });
+
+            LoadAndRegisterAsset("GreatSwordDeepAbyss", CustomAssetType.Item, new ItemConfig
+            {
+                Amount = 1,
+                CraftingStation = "piece_thorsforge",
+                Requirements = new RequirementConfig[]
+                {
+                    new RequirementConfig
+                    {
+                        Item = "DeepAbyssEssence",
+                        Amount = 60,
+                        AmountPerLevel = 40
+                    },
+                    new RequirementConfig
+                    {
+                        Item = "YggdrasilWood",
+                        Amount = 40,
+                        AmountPerLevel = 20
+                    }
+                }
+            });
+
+
+            Jotunn.Logger.LogInfo("Loaded DeepAbyssWeapons");
+        }
+
+        private void LoadAndRegisterAsset(string assetName, CustomAssetType assetType, ItemConfig itemConfig = null, Action<ItemDrop> customizeItemAction = null, PieceConfig pieceConfig = null)
+        {
+            if (assetName.Contains("sfx"))
+            {
+                if (assetName.EndsWith(":sfx"))
+                {
+                    assetName = assetName.Substring(0, assetName.Length - ":sfx".Length);
+                }
+                sfxAssetNames.Add(assetName);
+            }
+
+            GameObject asset = assetBundle.LoadAsset<GameObject>(assetName);
+            switch (assetType)
+            {
+                case CustomAssetType.Prefab:
+                    CustomPrefab customPrefab = new CustomPrefab(asset, true);
+                    PrefabManager.Instance.AddPrefab(customPrefab);
+                    break;
+                case CustomAssetType.Item:
+                    CustomItem customItem;
+                    if (itemConfig != null)
+                    {
+                        customItem = new CustomItem(asset, true, itemConfig);
+                    }
+                    else
+                    {
+                        customItem = new CustomItem(asset, true);
+                    }
+                    ItemManager.Instance.AddItem(customItem);
+
+                    if (customizeItemAction != null)
+                    {
+                        GameObject itemGameObject = customItem.ItemPrefab;
+                        ItemDrop itemDropComponent = itemGameObject.GetComponent<ItemDrop>();
+                        if (itemDropComponent != null)
+                        {
+                            customizeItemAction(itemDropComponent);
+                        }
+                    }
+                    break;
+                case CustomAssetType.Piece:
+                    if (pieceConfig != null)
+                    {
+                        CustomPiece customPiece = new CustomPiece(asset, true, pieceConfig);
+                        PieceManager.Instance.AddPiece(customPiece);
+                    }
+                    break;
+                // Add more cases for future custom asset types
+                // case CustomAssetType.OtherType:
+                //     // Handle other custom asset type registration here
+                //     break;
+                default:
+                    break;
+            }
+        }
+
+        public enum CustomAssetType
+        {
+            Prefab,
+            Item,
+            Piece
+            // Add more custom asset types here for future additions
+            // OtherType,
         }
 
         private void LoadConfig()
@@ -2033,258 +2490,262 @@ namespace EpicValheimsAdditions
             }
         }
 
-        private void LoadContentConfig()
-        {
-            if (!File.Exists(configPath2))
-            {
-                GenerateConfigFile2();
-                Jotunn.Logger.LogInfo("Generated Content Configuration");
-                return;
-            }
-        }
-
         private void GenerateConfigFile()
         {
             var bossConfigs = new List<BossConfig>();
 
-            // SvartalfarQueen
-            var SvartalfarQueenConfig = new BossConfig();
-            var SvartalfarQueenPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("SvartalfarQueen");
-            SvartalfarQueenConfig.BossPrefabName = "SvartalfarQueen";
-            SvartalfarQueenConfig.Health = (int)SvartalfarQueenPrefab.m_health;
-
-            SvartalfarQueenConfig.Attacks = new List<CustomAttack>();
-            var SvartalfarQueenStandardAttacks = new List<string> { "SvartalfarQueenGreatSword", "SvartalfarQueenBow" };
-            AddDefaultAttacks(SvartalfarQueenConfig, SvartalfarQueenStandardAttacks);
-            var SvartalfarQueenRootspawn = PrefabManager.Cache.GetPrefab<ItemDrop>("SvartalfarQueen_rootspawn");
-            SvartalfarQueenConfig.Attacks.Add(new CustomAttack
+            // Define boss data in a dictionary
+            var bossData = new Dictionary<string, List<string>>
             {
-                AttackName = SvartalfarQueenRootspawn.name,
-                AttackAnimation = SvartalfarQueenRootspawn.m_itemData.m_shared.m_attack.m_attackAnimation,
-                AiAttackRange = SvartalfarQueenRootspawn.m_itemData.m_shared.m_aiAttackRange,
-                AiAttackRangeMin = SvartalfarQueenRootspawn.m_itemData.m_shared.m_aiAttackRangeMin,
-                AiAttackInterval = SvartalfarQueenRootspawn.m_itemData.m_shared.m_aiAttackInterval
-            });
-            var SvartalfarQueenRootspawn2 = PrefabManager.Cache.GetPrefab<ItemDrop>("SvarTentaRoot_attack");
-            SvartalfarQueenConfig.Attacks.Add(new CustomAttack
+                { "SvartalfarQueen", new List<string> { "SvartalfarQueenGreatSword", "SvartalfarQueenBow", "SvartalfarQueen_rootspawn", "SvarTentaRoot_attack", "SvartalfarQueenBowArrowStorm", "bow_projectile_svar" } },
+                { "Jotunn", new List<string> { "Jotunn_Groundslam", "Jotunn_Groundslam2", "Jotunn_Shoot" } },
+                { "HelDemon", new List<string> { "BlazingMace", "BlazingMace2", "BlazingMace3", "BlazingMace4", "Blazing_Nova", "Blazing_Shoot", "Blazing_Meteors", "projectile_meteor_blazing" } },
+                { "Golden_Greydwarf_Miniboss", new List<string> { "Greydwarf_elite_attack_gold" } },
+                { "Golden_Troll_Miniboss", new List<string> { "troll_punch", "troll_groundslam", "troll_throw" } },
+                { "Golden_Wraith_Miniboss", new List<string> { "wraith_melee_gold" } },
+                { "FrostwingFae", new List<string> { "Fairy_Attack1", "Fairy_Attack_Projectile" } },
+                { "CrystalhideUrsar", new List<string> { "Bear_Attack1", "Bear_Attack2", "Bear_Attack3", "Bear_Attack5" } },
+                { "CrystalhideUrsar_Cub", new List<string> { "Bear_Attack_cub" } },
+                { "InfernalMinotaur", new List<string> { "Minotaur_Attack1", "Minotaur_Attack2", "Minotaur_Attack3", "Minotaur_Attack4_kick" } },
+                { "MagmaSkarab", new List<string> { "Skarab_Attack1", "Skarab_Attack2", "Skarab_Attack3" } },
+                { "DraugrMariner", new List<string> { "Mariner_Attack1", "Mariner_Attack2" } }
+            };
+
+            foreach (var bossEntry in bossData)
             {
-                AttackName = SvartalfarQueenRootspawn2.name,
-                AiAttackRange = SvartalfarQueenRootspawn2.m_itemData.m_shared.m_aiAttackRange,
-                AiAttackRangeMin = SvartalfarQueenRootspawn2.m_itemData.m_shared.m_aiAttackRangeMin,
-                AiAttackInterval = SvartalfarQueenRootspawn2.m_itemData.m_shared.m_aiAttackInterval,
-                Damages = SvartalfarQueenRootspawn2.m_itemData.m_shared.m_damages
-            });
-            var SvartalfarQueenBowArrowStorm = PrefabManager.Cache.GetPrefab<ItemDrop>("SvartalfarQueenBowArrowStorm");
-            SvartalfarQueenConfig.Attacks.Add(new CustomAttack
-            {
-                AttackName = SvartalfarQueenBowArrowStorm.name,
-                AttackAnimation = SvartalfarQueenBowArrowStorm.m_itemData.m_shared.m_attack.m_attackAnimation,
-                AiAttackRange = SvartalfarQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackRange,
-                AiAttackRangeMin = SvartalfarQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackRangeMin,
-                AiAttackInterval = SvartalfarQueenBowArrowStorm.m_itemData.m_shared.m_aiAttackInterval
-            });
-            var bow_projectile_svar = PrefabManager.Cache.GetPrefab<Projectile>("bow_projectile_svar");
-            SvartalfarQueenConfig.Attacks.Add(new CustomAttack
-            {
-                AttackName = bow_projectile_svar.name,
-                Damages = bow_projectile_svar.m_damage
-            });
+                var bossName = bossEntry.Key;
+                var bossConfig = new BossConfig();
+                var bossPrefab = PrefabManager.Cache.GetPrefab<Humanoid>(bossName);
+                bossConfig.BossPrefabName = bossName;
+                bossConfig.Health = (int)bossPrefab.m_health;
 
-            bossConfigs.Add(SvartalfarQueenConfig);
+                bossConfig.Attacks = new List<CustomAttack>();
+                AddCustomAttacks(bossConfig, bossEntry.Value);
 
-            // Jotunn
-            var JotunnConfig = new BossConfig();
-            var JotunnPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Jotunn");
-            JotunnConfig.BossPrefabName = "Jotunn";
-            JotunnConfig.Health = (int)JotunnPrefab.m_health;
-
-            JotunnConfig.Attacks = new List<CustomAttack>();
-            var jotunnStandardAttacks = new List<string> { "Jotunn_Groundslam", "Jotunn_Groundslam2", "Jotunn_Shoot" };
-            AddDefaultAttacks(JotunnConfig, jotunnStandardAttacks);
-            bossConfigs.Add(JotunnConfig);
-
-            // HelDemon
-            var HelDemonConfig = new BossConfig();
-            var HelDemon = PrefabManager.Cache.GetPrefab<Humanoid>("HelDemon");
-            HelDemonConfig.BossPrefabName = "HelDemon";
-            HelDemonConfig.Health = (int)HelDemon.m_health;
-
-            HelDemonConfig.Attacks = new List<CustomAttack>();
-            var blazingDamnedStandardAttacks = new List<string> { "BlazingMace", "BlazingMace2", "BlazingMace3", "BlazingMace4", "Blazing_Nova", "Blazing_Shoot" };
-            AddDefaultAttacks(HelDemonConfig, blazingDamnedStandardAttacks);
-            var Blazing_Meteors = PrefabManager.Cache.GetPrefab<ItemDrop>("Blazing_Meteors");
-            HelDemonConfig.Attacks.Add(new CustomAttack
-            {
-                AttackName = Blazing_Meteors.name,
-                AttackAnimation = Blazing_Meteors.m_itemData.m_shared.m_attack.m_attackAnimation,
-                AiAttackRange = Blazing_Meteors.m_itemData.m_shared.m_aiAttackRange,
-                AiAttackRangeMin = Blazing_Meteors.m_itemData.m_shared.m_aiAttackRangeMin,
-                AiAttackInterval = Blazing_Meteors.m_itemData.m_shared.m_aiAttackInterval
-            });
-            var projectile_meteor_blazing = PrefabManager.Cache.GetPrefab<Projectile>("projectile_meteor_blazing");
-            HelDemonConfig.Attacks.Add(new CustomAttack
-            {
-                AttackName = projectile_meteor_blazing.name,
-                Damages = projectile_meteor_blazing.m_damage
-            });
-            bossConfigs.Add(HelDemonConfig);
-
-            // Golden_Greydwarf_Miniboss
-            var GoldenGreydwarfConfig = new BossConfig();
-            var GoldenGreydwarfPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Golden_Greydwarf_Miniboss");
-            GoldenGreydwarfConfig.BossPrefabName = "Golden_Greydwarf_Miniboss";
-            GoldenGreydwarfConfig.Health = (int)GoldenGreydwarfPrefab.m_health;
-
-            GoldenGreydwarfConfig.Attacks = new List<CustomAttack>();
-            var GoldenGreydwarfStandardAttacks = new List<string> { "Greydwarf_elite_attack_gold" };
-            AddDefaultAttacks(GoldenGreydwarfConfig, GoldenGreydwarfStandardAttacks);
-
-            bossConfigs.Add(GoldenGreydwarfConfig);
-
-            // Golden_Troll_Miniboss
-            var GoldenTrollConfig = new BossConfig();
-            var GoldenTrollPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Golden_Troll_Miniboss");
-            GoldenTrollConfig.BossPrefabName = "Golden_Troll_Miniboss";
-            GoldenTrollConfig.Health = (int)GoldenTrollPrefab.m_health;
-
-            GoldenTrollConfig.Attacks = new List<CustomAttack>();
-            var GoldenTrollStandardAttacks = new List<string> { "troll_punch", "troll_groundslam", "troll_throw" };
-            AddDefaultAttacks(GoldenTrollConfig, GoldenTrollStandardAttacks);
-
-            bossConfigs.Add(GoldenTrollConfig);
-
-            // Golden_Wraith_Miniboss
-            var GoldenWraithConfig = new BossConfig();
-            var GoldenWraithPrefab = PrefabManager.Cache.GetPrefab<Humanoid>("Golden_Wraith_Miniboss");
-            GoldenWraithConfig.BossPrefabName = "Golden_Wraith_Miniboss";
-            GoldenWraithConfig.Health = (int)GoldenWraithPrefab.m_health;
-
-            GoldenWraithConfig.Attacks = new List<CustomAttack>();
-            var GoldenWraithStandardAttacks = new List<string> { "wraith_melee_gold" };
-            AddDefaultAttacks(GoldenWraithConfig, GoldenWraithStandardAttacks);
-
-            bossConfigs.Add(GoldenWraithConfig);
+                bossConfigs.Add(bossConfig);
+            }
 
             var jsonText = JsonMapper.ToJson(bossConfigs);
             File.WriteAllText(configPath, jsonText);
-
         }
 
-        private void GenerateConfigFile2()
-        {
-            var evaconfig = new List<EVAConfiguration>();
-
-            var contentconfig = new EVAConfiguration();
-            contentconfig.Description = "Locations contain (Altars/Bosses/Vegvisirs/Ores/Trees), Mistlands/Deepnorth/Ashlands contain (Weapons/Tools/Resources/Crafting tables/Boss summons). Having just the locations toggled true, wouldn't work progression wise.";
-            contentconfig.MistlandsLocations = false;
-            contentconfig.Mistlands = false;
-            contentconfig.DeepNorthLocations = true;
-            contentconfig.DeepNorth = true;
-            contentconfig.AshlandsLocations = true;
-            contentconfig.Ashlands = true;
-            evaconfig.Add(contentconfig);
-
-            var jsonText2 = JsonMapper.ToJson(evaconfig);
-            File.WriteAllText(configPath2, jsonText2);
-        }
-
-        private void AddDefaultAttacks(BossConfig config, List<string> attackNames)
+        private void AddCustomAttacks(BossConfig config, List<string> attackNames)
         {
             foreach (var attackName in attackNames)
             {
-                var attack = PrefabManager.Cache.GetPrefab<ItemDrop>(attackName);
-                config.Attacks.Add(new CustomAttack
+                if (attackName.ToLower().Contains("projectile"))
                 {
-                    AttackName = attack.name,
-                    AttackAnimation = attack.m_itemData.m_shared.m_attack.m_attackAnimation,
-                    AiAttackRange = attack.m_itemData.m_shared.m_aiAttackRange,
-                    AiAttackRangeMin = attack.m_itemData.m_shared.m_aiAttackRangeMin,
-                    AiAttackInterval = attack.m_itemData.m_shared.m_aiAttackInterval,
-                    Damages = attack.m_itemData.m_shared.m_damages
-                });
+                    var attackPrefab = PrefabManager.Cache.GetPrefab<Projectile>(attackName);
+                    var customAttack = new CustomAttack
+                    {
+                        AttackName = attackName,
+                        Damages = attackPrefab.m_damage
+                    };
+                    config.Attacks.Add(customAttack);
+                }
+                else
+                {
+                    var attackPrefab = PrefabManager.Cache.GetPrefab<ItemDrop>(attackName);
+
+                    if (attackPrefab != null)
+                    {
+                        var customAttack = new CustomAttack
+                        {
+                            AttackName = attackName,
+                            AttackAnimation = attackPrefab.m_itemData.m_shared.m_attack.m_attackAnimation,
+                            AiAttackRange = attackPrefab.m_itemData.m_shared.m_aiAttackRange,
+                            AiAttackRangeMin = attackPrefab.m_itemData.m_shared.m_aiAttackRangeMin,
+                            AiAttackInterval = attackPrefab.m_itemData.m_shared.m_aiAttackInterval,
+                            Damages = attackPrefab.m_itemData.m_shared.m_damages
+                        };
+
+                        config.Attacks.Add(customAttack);
+                    }
+                    else
+                    {
+                        Jotunn.Logger.LogError($"Loading config for {attackName} failed. This attack was either deleted or renamed.");
+                    }
+                }
             }
         }
 
         private void RegisterConfigValues()
         {
-            var bossConfigs = GetJson();
-
+            var bossConfigs = GetJson<BossConfig>(configPath);
 
             foreach (var config in bossConfigs)
             {
+                UpdateBossHealth(config);
+                UpdateBossAttacks(config);
+            }
+
+            Jotunn.Logger.LogInfo("Loaded configs");
+        }
+
+        private void UpdateBossHealth(BossConfig config)
+        {
+            try
+            {
+                var bossPrefab = PrefabManager.Cache.GetPrefab<Humanoid>(config.BossPrefabName);
+                bossPrefab.m_health = config.Health;
+            }
+            catch (Exception e)
+            {
+                Jotunn.Logger.LogError($"Loading config for {config.BossPrefabName} failed. {e.Message} {e.StackTrace}");
+            }
+        }
+
+        private void UpdateBossAttacks(BossConfig config)
+        {
+            foreach (var attack in config.Attacks)
+            {
                 try
                 {
-
-                    PrefabManager.Cache.GetPrefab<Humanoid>(config.BossPrefabName).m_health = config.Health;
-
-
-
-                    foreach (var attack in config.Attacks)
+                    if (attack.AttackName.ToLower().Contains("projectile"))
                     {
-                        try
+                        var projectile = PrefabManager.Cache.GetPrefab<Projectile>(attack.AttackName);
+                        projectile.m_damage = attack.Damages.Value;
+                    }
+                    else
+                    {
+                        var itemDrop = PrefabManager.Cache.GetPrefab<ItemDrop>(attack.AttackName);
+                        if (attack.Damages != null)
                         {
-                            if (attack.AttackName.ToLower().Contains("projectile"))
-                            {
-                                var projectile = PrefabManager.Cache.GetPrefab<Projectile>(attack.AttackName);
-                                projectile.m_damage = attack.Damages.Value;
-                            }
-                            else
-                            {
-                                var itemDrop = PrefabManager.Cache.GetPrefab<ItemDrop>(attack.AttackName);
-                                if (attack.Damages != null)
-                                {
-                                    itemDrop.m_itemData.m_shared.m_damages = attack.Damages.Value;
-                                }
-                                if (attack.AttackAnimation != null)
-                                {
-                                    itemDrop.m_itemData.m_shared.m_attack.m_attackAnimation = attack.AttackAnimation;
-                                }
-                                itemDrop.m_itemData.m_shared.m_aiAttackRange = attack.AiAttackRange;
-                                itemDrop.m_itemData.m_shared.m_aiAttackRangeMin = attack.AiAttackRangeMin;
-                                itemDrop.m_itemData.m_shared.m_aiAttackInterval = attack.AiAttackInterval;
-                            }
+                            itemDrop.m_itemData.m_shared.m_damages = attack.Damages.Value;
                         }
-                        catch (Exception e)
+                        if (attack.AttackAnimation != null)
                         {
-                            Jotunn.Logger.LogError($"Loading config for {attack.AttackName} failed. This attack was either deleted or renamed. {e.Message} {e.StackTrace}");
+                            itemDrop.m_itemData.m_shared.m_attack.m_attackAnimation = attack.AttackAnimation;
                         }
+                        itemDrop.m_itemData.m_shared.m_aiAttackRange = attack.AiAttackRange;
+                        itemDrop.m_itemData.m_shared.m_aiAttackRangeMin = attack.AiAttackRangeMin;
+                        itemDrop.m_itemData.m_shared.m_aiAttackInterval = attack.AiAttackInterval;
                     }
                 }
                 catch (Exception e)
                 {
-                    Jotunn.Logger.LogError($"Loading config for {config.BossPrefabName} failed. {e.Message} {e.StackTrace}");
+                    Jotunn.Logger.LogError($"Loading config for {attack.AttackName} failed. This attack was either deleted or renamed. {e.Message} {e.StackTrace}");
                 }
             }
-
-
-
-
-            Jotunn.Logger.LogInfo("Loaded configs");
-
         }
 
-        internal static List<BossConfig> GetJson()
+        private bool IsExpectedFormat(OldConfiguration oldConfig)
+        {
+            return oldConfig != null &&
+                   oldConfig.Description != null;
+        }
+
+        private void LoadContentConfig()
+        {
+            EVAConfiguration contentconfig = GetDefaultEVAConfiguration();
+
+            if (!File.Exists(configPath2))
+            {
+                Jotunn.Logger.LogInfo("Generated Content Configuration");
+                SaveEVAConfiguration(contentconfig);
+                return;
+            }
+
+            var jsonText = File.ReadAllText(configPath2);
+            var oldConfigs = JsonMapper.ToObject<List<OldConfiguration>>(jsonText);
+
+            if (oldConfigs == null || oldConfigs.Count == 0)
+            {
+                Jotunn.Logger.LogInfo("Generated Content Configuration");
+                SaveEVAConfiguration(contentconfig);
+                return;
+            }
+
+            var oldConfig = oldConfigs[0];
+            if (!IsExpectedFormat(oldConfig))
+            {
+                Jotunn.Logger.LogInfo("Loaded Content Configuration");
+                return;
+            }
+
+            contentconfig = new EVAConfiguration
+            {
+                Content = new ContentConfiguration
+                {
+                    Mistlands = oldConfig.Mistlands,
+                    DeepNorth = oldConfig.DeepNorth,
+                    Ashlands = oldConfig.Ashlands
+                },
+                Locations = new LocationConfiguration
+                {
+                    MistlandsLocations = oldConfig.MistlandsLocations,
+                    DeepNorthLocations = oldConfig.DeepNorthLocations,
+                    AshlandsLocations = oldConfig.AshlandsLocations
+                },
+                Creatures = new CreatureConfiguration
+                {
+                    DeepNorthCreatures = true,
+                    AshlandsCreatures = true,
+                    OceanCreatures = true
+                },
+                Content_Description = contentDescription
+            };
+
+            Jotunn.Logger.LogInfo("Updated old Content Configuration");
+            SaveEVAConfiguration(contentconfig);
+        }
+
+        private void SaveEVAConfiguration(EVAConfiguration config)
+        {
+            var evaconfig = new List<EVAConfiguration>
+            {
+                config
+            };
+            var jsonText = JsonMapper.ToJson(evaconfig);
+            File.WriteAllText(configPath2, jsonText);
+        }
+
+        private EVAConfiguration GetDefaultEVAConfiguration()
+        {
+            return new EVAConfiguration
+            {
+                Content = new ContentConfiguration
+                {
+                    Mistlands = false,
+                    DeepNorth = true,
+                    Ashlands = true
+                },
+                Locations = new LocationConfiguration
+                {
+                    MistlandsLocations = false,
+                    DeepNorthLocations = true,
+                    AshlandsLocations = true
+                },
+                Creatures = new CreatureConfiguration
+                {
+                    DeepNorthCreatures = true,
+                    AshlandsCreatures = true,
+                    OceanCreatures = true
+                },
+                Content_Description = contentDescription
+            };
+        }
+
+        string contentDescription =
+                        "This JSON configuration controls various aspects of in-game content and features. " +
+                        "Adjust the boolean values to enable or disable specific content, locations, and creatures. " +
+                        "Customize your in-game experience using the following sections:" +
+                        "- 'Content': Toggle to enable or disable general content such as Weapons, Tools, Resources, Crafting tables, and Boss summons." +
+                        "- 'Locations': Manage the presence of in-game locations, including Altars, Bosses, Vegvisirs, Ores, and Vegetation." +
+                        "- 'Creatures': Control the spawning of custom creatures in different biomes, including the ocean biome." +
+                        " **Note:** Modifying these settings can lead to warnings and errors in-game. Proceed with caution and only make changes if you understand their implications.";
+
+        internal static List<T> GetJson<T>(string configPath)
         {
             Jotunn.Logger.LogDebug($"Attempting to load config file from path {configPath}");
             var jsonText = AssetUtils.LoadText(configPath);
             Jotunn.Logger.LogDebug("File found. Attempting to deserialize...");
-            var bossconfigs = JsonMapper.ToObject<List<BossConfig>>(jsonText);
-            return bossconfigs;
-        }
-
-        internal static List<EVAConfiguration> GetJson2()
-        {
-            Jotunn.Logger.LogDebug($"Attempting to load config file from path {configPath2}");
-            var jsonText2 = AssetUtils.LoadText(configPath2);
-            Jotunn.Logger.LogDebug("File found. Attempting to deserialize...");
-            var evaconfiguration = JsonMapper.ToObject<List<EVAConfiguration>>(jsonText2);
-            return evaconfiguration;
+            var configs = JsonMapper.ToObject<List<T>>(jsonText);
+            return configs;
         }
     }
 
     [Serializable]
-
-
     public class BossConfig
     {
         public string BossPrefabName { get; set; }
@@ -2306,6 +2767,36 @@ namespace EpicValheimsAdditions
     [Serializable]
     public class EVAConfiguration
     {
+        public string Content_Description { get; set; }
+        public ContentConfiguration Content { get; set; }
+        public LocationConfiguration Locations { get; set; }
+        public CreatureConfiguration Creatures { get; set; }
+    }
+    [Serializable]
+    public class ContentConfiguration
+    {
+        public bool Mistlands { get; set; }
+        public bool DeepNorth { get; set; }
+        public bool Ashlands { get; set; }
+    }
+    [Serializable]
+    public class LocationConfiguration
+    {
+        public bool MistlandsLocations { get; set; }
+        public bool DeepNorthLocations { get; set; }
+        public bool AshlandsLocations { get; set; }
+    }
+
+    [Serializable]
+    public class CreatureConfiguration
+    {
+        public bool DeepNorthCreatures { get; set; }
+        public bool AshlandsCreatures { get; set; }
+        public bool OceanCreatures { get; set; }
+    }
+    [Serializable]
+    public class OldConfiguration
+    {
         public string Description { get; set; }
         public bool MistlandsLocations { get; set; }
         public bool Mistlands { get; set; }
@@ -2313,6 +2804,5 @@ namespace EpicValheimsAdditions
         public bool DeepNorth { get; set; }
         public bool AshlandsLocations { get; set; }
         public bool Ashlands { get; set; }
-
     }
 }
