@@ -1,8 +1,8 @@
-![](https://i.imgur.com/4XooUJw.png)
+![](https://i.imgur.com/lL5QSZc.png)
 
 ![Epic Valheim Additions](https://i.imgur.com/9wBIvSa.png)
 # Showcase video updated for 2.0
-[![Showcase Video](https://img.youtube.com/vi/Xk5-0zWnhCg/0.jpg)](https://www.youtube.com/watch?v=Xk5-0zWnhCg)
+[![Showcase Video](https://i.imgur.com/WSM2fHu.png)](https://www.youtube.com/watch?v=BIsUTByDdnU)
 
 ![Epic Valheim Additions](https://i.imgur.com/ZFbsbQk.png)
 **ALL EVA MISTLANDS CONTENT IS DISABLED BY DEFAULT**
