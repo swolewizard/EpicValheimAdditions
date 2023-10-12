@@ -18,7 +18,7 @@ namespace EpicValheimsAdditions
     public class Core : BaseUnityPlugin
     {
         private const string ModName = "Epic Valheims Additions - by Huntard";
-        private const string ModVersion = "2.0.0";
+        private const string ModVersion = "2.0.1";
         private const string ModGUID = "Huntard.EpicValheimsAdditions";
 
         public static string configPath = Path.Combine(BepInEx.Paths.ConfigPath, $"{ModGUID}.json");
@@ -58,12 +58,12 @@ namespace EpicValheimsAdditions
         }
         public void Start()
         {
-            UpgradeWorld.Upgrade.Register("EVA_upgrade_mistlands", "Adds Mistlands locations and vegetations of mod EVA.", "locations_add SvartalfrQueenAltar_New,Vegvisir_SvartalfrQueen", "vegetation_reset HeavymetalVein start");
+            UpgradeWorld.Upgrade.Register("EVA_upgrade_mistlands", "Adds Mistlands locations and vegetations of mod EVA.", "locations_add SvartalfrQueenAltar_New,Vegvisir_SvartalfrQueen start", "vegetation_reset HeavymetalVein start");
 
-            UpgradeWorld.Upgrade.Register("EVA_upgrade_deepnorth", "Adds DeepNorth locations and vegetations of mod EVA.", "locations_add JotunnAltar,Vegvisir_Jotunn", "vegetation_reset FrometalVein_frac,EVA_Rock1,EVA_Rock2,EVA_Rock3," +
+            UpgradeWorld.Upgrade.Register("EVA_upgrade_deepnorth", "Adds DeepNorth locations and vegetations of mod EVA.", "locations_add JotunnAltar,Vegvisir_Jotunn start", "vegetation_reset FrometalVein_frac,EVA_Rock1,EVA_Rock2,EVA_Rock3," +
                 "EVA_Rock4,EVA_Rock5,EVA_Rock6,EVA_Rock7,EVA_Rock8,EVA_Rock9,EVA_Rock10,EVA_Rock11,EVA_Rock12,EVA_Rock13,EVA_Tree1,EVA_Tree2,EVA_Tree3,EVA_Bush1,EVA_Bush2,Pickable_Snowgil_Shroom start");
 
-            UpgradeWorld.Upgrade.Register("EVA_upgrade_ashlands", "Adds Ashlands locations and vegetations of mod EVA.", "locations_add BlazingDamnedOneAltar,Vegvisir_BlazingDamnedOne", "vegetation_reset EVA_SutRock1,EVA_SutRock2,EVA_SutRock3," +
+            UpgradeWorld.Upgrade.Register("EVA_upgrade_ashlands", "Adds Ashlands locations and vegetations of mod EVA.", "locations_add BlazingDamnedOneAltar,Vegvisir_BlazingDamnedOne start", "vegetation_reset EVA_SutRock1,EVA_SutRock2,EVA_SutRock3," +
                 "EVA_SutRock4,EVA_SutRock5,EVA_SutRock6,EVA_SutRock7,EVA_SutRock8,EVA_SutRock9,EVA_SutRock10,EVA_SutRock11,EVA_BurningTree1,EVA_BurningTree2,EVA_BurningTree3,EVA_BurningBush1,EVA_BurningBush2,EVA_BurningBush3,Pickable_Emberbloom start");
 
             UpgradeWorld.Upgrade.Register("EVA_upgrade", "Adds all locations and vegetations of mod EVA.", "locations_add SvartalfrQueenAltar_New,Vegvisir_SvartalfrQueen,JotunnAltar,Vegvisir_Jotunn,BlazingDamnedOneAltar,Vegvisir_BlazingDamnedOne start",
@@ -82,9 +82,9 @@ namespace EpicValheimsAdditions
                 {
                     if (config.Creatures.DeepNorthCreatures)
                     {
-                        CreateCreatures("CrystalhideUrsar", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, 15f, 3, "Crystalhide Ursar");
-                        CreateCreatures("CrystalhideUrsar_Cub", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, 5f, 1, "Crystalhide Ursar Cub");
-                        CreateCreatures("FrostwingFae", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, 15f, 4, "Frostwing Fae");
+                        CreateCreatures("CrystalhideUrsar", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, spawnChance: 33f, maxSpawned: 5, minlevel: 1, maxlevel: 3, spawninterval: 330, "Crystalhide Ursar");
+                        CreateCreatures("CrystalhideUrsar_Cub", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, spawnChance: 5f, maxSpawned: 1, minlevel: 1, maxlevel: 1, spawninterval: 60, "Crystalhide Ursar Cub");
+                        CreateCreatures("FrostwingFae", Character.Faction.MountainMonsters, Heightmap.Biome.DeepNorth, spawnChance: 15f, maxSpawned: 3, minlevel: 1, maxlevel: 1, spawninterval: 500, "Frostwing Fae");
                     }
                     else
                     {
@@ -95,8 +95,8 @@ namespace EpicValheimsAdditions
                     }
                     if (config.Creatures.AshlandsCreatures)
                     {
-                        CreateCreatures("MagmaSkarab", Character.Faction.Demon, Heightmap.Biome.AshLands, 15f, 4, "Magma Skarab");
-                        CreateCreatures("InfernalMinotaur", Character.Faction.Demon, Heightmap.Biome.AshLands, 15f, 3, "Infernal Minotaur");
+                        CreateCreatures("MagmaSkarab", Character.Faction.Demon, Heightmap.Biome.AshLands, spawnChance: 15f, maxSpawned: 3, minlevel: 1, maxlevel: 2, spawninterval: 250, "Magma Skarab");
+                        CreateCreatures("InfernalMinotaur", Character.Faction.Demon, Heightmap.Biome.AshLands, spawnChance: 33f, maxSpawned: 5, minlevel: 1, maxlevel: 3, spawninterval: 400, "Infernal Minotaur");
                     }
                     else
                     {
@@ -106,7 +106,7 @@ namespace EpicValheimsAdditions
                     }
                     if (config.Creatures.OceanCreatures)
                     {
-                        CreateCreatures("DraugrMariner", Character.Faction.SeaMonsters, Heightmap.Biome.Ocean, 15f, 3, "Draugr Mariner", "Killed_HelDemon");
+                        CreateCreatures("DraugrMariner", Character.Faction.SeaMonsters, Heightmap.Biome.Ocean, spawnChance: 10f, maxSpawned: 3, minlevel: 1, maxlevel: 1, spawninterval: 500, "Draugr Mariner", "Killed_HelDemon");
                     }
                     else
                     {
@@ -122,7 +122,7 @@ namespace EpicValheimsAdditions
             Jotunn.Logger.LogInfo("Loaded Creatures");
         }
 
-        private void CreateCreatures(string creaturePrefabName, Character.Faction faction, Heightmap.Biome biome, float spawnChance, int maxSpawned, string spawnName, string key = "")
+        private void CreateCreatures(string creaturePrefabName, Character.Faction faction, Heightmap.Biome biome, float spawnChance, int maxSpawned, int minlevel, int maxlevel, int spawninterval, string spawnName, string key = "")
         {
             var customCreaturePrefab = assetBundle.LoadAsset<GameObject>(creaturePrefabName);
 
@@ -139,6 +139,8 @@ namespace EpicValheimsAdditions
                     MaxSpawned = maxSpawned,
                     Biome = biome,
                     RequiredGlobalKey = key,
+                    MaxLevel = maxlevel,
+                    MinLevel = minlevel,
                     MaxAltitude = -5,
                     MinAltitude = -100,
                     SpawnDistance = 50,
@@ -150,7 +152,7 @@ namespace EpicValheimsAdditions
                     SpawnInForest = true,
                     SpawnOutsideForest = true,
                     BiomeArea = Heightmap.BiomeArea.Median,
-                    SpawnInterval = 500,
+                    SpawnInterval = spawninterval,
                     GroundOffset = 0.5f,
                     SpawnAtDay = false,
                     SpawnAtNight = true
@@ -164,7 +166,12 @@ namespace EpicValheimsAdditions
                     SpawnChance = spawnChance,
                     MaxSpawned = maxSpawned,
                     Biome = biome,
-                    RequiredGlobalKey = key
+                    RequiredGlobalKey = key,
+                    MaxLevel = maxlevel,
+                    MinLevel = minlevel,
+                    SpawnDistance = 30,
+                    SpawnInterval = spawninterval,
+                    GroupRadius = 10
                 });
             }
             
